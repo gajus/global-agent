@@ -15,7 +15,7 @@ Global HTTP/HTTPS proxy configurable using environment variables.
 * [FAQ](#faq)
   * [How does it work?](#how-does-it-work)
   * [What version of Node.js are supported?](#what-version-of-nodejs-are-supported)
-  * [What is the reason `global-agent` does not use the standard `HTTP_PROXY` environment variable?](#what-is-the-reason-global-agent-does-not-use-the-standard-http-proxy-environment-variable)
+  * [What is the reason `global-agent` does not use `HTTP_PROXY`?](#what-is-the-reason-global-agent-does-not-use-http-proxy)
   * [What is the difference from `global-tunnel`?](#what-is-the-difference-from-global-tunnel)
 
 ## Usage
@@ -49,9 +49,47 @@ $ node -r 'global-agent/bootstrap' your-script.js
 
 ```
 
+### Runtime configuration
+
+`global-agent/bootstrap` script copies `process.env.GLOBAL_AGENT_HTTP_PROXY` value to `global.GLOBAL_AGENT.HTTP_PROXY` and continues to use the latter variable.
+
+You can override the `global.GLOBAL_AGENT.HTTP_PROXY` value at runtime to change proxy behaviour, e.g.
+
+```js
+http.get('http://127.0.0.1:8000');
+
+global.GLOBAL_AGENT.HTTP_PROXY = 'http://127.0.0.1:8001';
+
+http.get('http://127.0.0.1:8000');
+
+global.GLOBAL_AGENT.HTTP_PROXY = 'http://127.0.0.1:8002';
+
+```
+
+First HTTP request is going to use http://127.0.0.1:8001 proxy and secord request is going to use http://127.0.0.1:8002.
+
+All `global-agent` configuration is available under `global.GLOBAL_AGENT` namespace.
+
+### Exclude URLs
+
+The `GLOBAL_AGENT_NO_PROXY` environment variable specifies URLs that should be excluded from proxying. `GLOBAL_AGENT_NO_PROXY` value is a comma-separated list of hostnames, domain names, or a mixture of both. Asterisks can be used as wildcards, but other clients may not support that. Domain names may be indicated by a leading dot, e.g.
+
+```bash
+export GLOBAL_AGENT_NO_PROXY='*.foo.com,.baz.com'
+
+```
+
+says to contact all machines in the 'foo.com' and 'baz.com' domains directly.
+
 ### Enable logging
 
-`global-agent` is using [`roarr`](https://www.npmjs.com/package/roarr) logger to log HTTP requests.
+`global-agent` is using [`roarr`](https://www.npmjs.com/package/roarr) logger to log HTTP requests, e.g.
+
+```json
+{"context":{"program":"global-agent","namespace":"HttpProxyAgent","logLevel":10},"message":"proxying request to http://127.0.0.1/","sequence":0,"time":1556204634939,"version":"1.0.0"}
+{"context":{"program":"global-agent","namespace":"HttpsProxyAgent","logLevel":10},"message":"proxying request to https://127.0.0.1:80/","sequence":1,"time":1556204639965,"version":"1.0.0"}
+
+```
 
 Export `ROARR_LOG=true` environment variable to enable log printing to stdout.
 
@@ -71,17 +109,18 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
 
 ### How does it work?
 
-`global-agent` works be configuring [`http.globalAgent`](https://nodejs.org/api/http.html#http_http_globalagent) and [`https.globalAgent`](https://nodejs.org/api/https.html#https_https_globalagent).
+`global-agent` configures [`http.globalAgent`](https://nodejs.org/api/http.html#http_http_globalagent) and [`https.globalAgent`](https://nodejs.org/api/https.html#https_https_globalagent) to use a custom [Agent](https://nodejs.org/api/http.html#http_class_http_agent) for HTTP and HTTPS.
 
-### What version of Node.js are supported?
+### What versions of Node.js are supported?
 
 `global-agent` works with Node.js v12.0.0 and above.
 
-### What is the reason `global-agent` does not use the standard `HTTP_PROXY` environment variable?
+### What is the reason `global-agent` does not use `HTTP_PROXY`?
 
 Some libraries (e.g. [`request`](https://npmjs.org/package/request)) change their behaviour when `HTTP_PROXY` environment variable is present. Using a namespaced environment variable prevents conflicting library behaviour.
 
-### What is the difference from `global-tunnel`?
+### What is the difference from `global-tunnel` and `tunnel`?
 
-[`global-tunnel`](https://github.com/salesforce/global-tunnel) (and [`global-tunnel-ng`](https://github.com/np-maintain/global-tunnel)) are designed to support legacy Node.js versions and rely on [monkey-patching `http.request`, `http.get`, `https.request` and `https.get` methods](https://github.com/np-maintain/global-tunnel/blob/51413dcf0534252b5049ec213105c7063ccc6367/index.js#L302-L338). `global-agent` works by configuring [`http.globalAgent`](https://nodejs.org/api/http.html#http_http_globalagent).
+[`global-tunnel`](https://github.com/salesforce/global-tunnel) (including [`global-tunnel-ng`](https://github.com/np-maintain/global-tunnel) and [`tunnel`](https://npmjs.com/package/tunnel)) are designed to support legacy Node.js versions. They use various [workarounds](https://github.com/koichik/node-tunnel/blob/5fb2fb424788597146b7be6729006cad1cf9e9a8/lib/tunnel.js#L134-L144) and rely on [monkey-patching `http.request`, `http.get`, `https.request` and `https.get` methods](https://github.com/np-maintain/global-tunnel/blob/51413dcf0534252b5049ec213105c7063ccc6367/index.js#L302-L338).
 
+In contrast, `global-agent` supports only Node.js v12 and above, and works by configuring [`http.globalAgent`](https://nodejs.org/api/http.html#http_http_globalagent).
