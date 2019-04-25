@@ -1,0 +1,25 @@
+{
+  "env": {
+    "test": {
+      "plugins": [
+        "istanbul"
+      ]
+    }
+  },
+  "plugins": [
+    "transform-export-default-name",
+    "@babel/transform-flow-strip-types"
+  ],
+  "presets": [
+    [
+      "@babel/env",
+      {
+        "corejs": "core-js@3",
+        "targets": {
+          "node": "10"
+        },
+        "useBuiltIns": "usage"
+      }
+    ]
+  ]
+}
