@@ -24,11 +24,9 @@ export default (subjectUrl: string, noProxy: string) => {
       throw new UnexpectedStateError('NO_PROXY entry pattern must include hostname. Use * to match any hostname.');
     }
 
-    if ((subjectUrlTokens.port || ruleMatch.groups.port) && subjectUrlTokens.port !== ruleMatch.groups.port) {
-      continue;
-    }
+    const hostnameIsMatch = matcher.isMatch(subjectUrlTokens.hostname, ruleMatch.groups.hostname);
 
-    if (matcher.isMatch(subjectUrlTokens.hostname, ruleMatch.groups.hostname)) {
+    if (hostnameIsMatch && (!ruleMatch.groups || !ruleMatch.groups.port || subjectUrlTokens.port && subjectUrlTokens.port === ruleMatch.groups.port)) {
       return true;
     }
   }

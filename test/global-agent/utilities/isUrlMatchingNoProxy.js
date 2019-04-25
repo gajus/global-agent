@@ -7,6 +7,10 @@ test('returns `true` if hosts match', (t) => {
   t.assert(isUrlMatchingNoProxy('http://foo.com/', 'foo.com'));
 });
 
+test('returns `true` if hosts match (IP)', (t) => {
+  t.assert(isUrlMatchingNoProxy('http://127.0.0.1/', '127.0.0.1'));
+});
+
 test('returns `true` if hosts match (using wildcard)', (t) => {
   t.assert(isUrlMatchingNoProxy('http://bar.foo.com/', '*.foo.com'));
 });
@@ -19,14 +23,22 @@ test('returns `true` if hosts and ports match', (t) => {
   t.assert(isUrlMatchingNoProxy('http://foo.com:8080/', 'foo.com:8080'));
 });
 
-test('returns `false` if host matches and port does not match (diffferent port)', (t) => {
+test('returns `true` if hosts match and NO_PROXY does not define port', (t) => {
+  t.assert(isUrlMatchingNoProxy('http://foo.com:8080/', 'foo.com'));
+});
+
+test('returns `true` if hosts (IP) and ports match', (t) => {
+  t.assert(isUrlMatchingNoProxy('http://127.0.0.1:8080/', '127.0.0.1:8080'));
+});
+
+test('returns `false` if hosts match and ports do not match (diffferent port)', (t) => {
   t.assert(isUrlMatchingNoProxy('http://foo.com:8080/', 'foo.com:8000') === false);
 });
 
-test('returns `false` if host matches and port does not match (port not present subject)', (t) => {
+test('returns `false` if hosts match and ports do not match (port not present subject)', (t) => {
   t.assert(isUrlMatchingNoProxy('http://foo.com/', 'foo.com:8000') === false);
 });
 
-test('returns `false` if host matches and port does not match (port not present NO_PROXY)', (t) => {
-  t.assert(isUrlMatchingNoProxy('http://foo.com:8000/', 'foo.com') === false);
+test('returns `true` if hosts match and ports do not match (port not present NO_PROXY)', (t) => {
+  t.assert(isUrlMatchingNoProxy('http://foo.com:8000/', 'foo.com'));
 });
