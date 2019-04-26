@@ -16,7 +16,7 @@
       {
         "corejs": "core-js@3",
         "targets": {
-          "node": "10"
+          "node": "12"
         },
         "useBuiltIns": "usage"
       }
