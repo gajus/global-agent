@@ -90,8 +90,8 @@ says to contact all machines with the 'foo.com' TLD and 'baz.com' domains direct
 `global-agent` is using [`roarr`](https://www.npmjs.com/package/roarr) logger to log HTTP requests, e.g.
 
 ```json
-{"context":{"program":"global-agent","namespace":"HttpProxyAgent","logLevel":10},"message":"proxying request to http://127.0.0.1/","sequence":0,"time":1556204634939,"version":"1.0.0"}
-{"context":{"program":"global-agent","namespace":"HttpsProxyAgent","logLevel":10},"message":"proxying request to https://127.0.0.1:80/","sequence":1,"time":1556204639965,"version":"1.0.0"}
+{"context":{"program":"global-agent","namespace":"Agent","logLevel":10,"destination":"https://dev.to:443/api/tags%3Fpage=1","proxy":"http://127.0.0.1:8076"},"message":"proxying request","sequence":23,"time":1556269669663,"version":"1.0.0"}
+{"context":{"program":"global-agent","namespace":"Agent","logLevel":10,"destination":"https://dev.to:443/api/tags%3Fpage=2","proxy":"http://127.0.0.1:8076"},"message":"proxying request","sequence":24,"time":1556269670311,"version":"1.0.0"}
 
 ```
 
