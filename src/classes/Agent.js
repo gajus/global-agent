@@ -38,6 +38,8 @@ class Agent {
     });
 
     if (this.mustUrlUseProxy(requestUrl)) {
+      request.path = requestUrl;
+
       const proxy = this.getUrlProxy(requestUrl);
 
       log.trace('proxying request to %s use %s proxy', requestUrl, 'http://' + proxy.hostname + ':' + proxy.port);
