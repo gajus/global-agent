@@ -63,7 +63,6 @@ export default () => {
   // @see https://github.com/facebook/flow/issues/7670
   // $FlowFixMe
   http.globalAgent = new HttpProxyAgent(
-    'http:',
     mustUrlUseProxy,
     getUrlProxy,
     http.globalAgent
@@ -71,9 +70,8 @@ export default () => {
 
   // $FlowFixMe
   https.globalAgent = new HttpsProxyAgent(
-    'https:',
     mustUrlUseProxy,
     getUrlProxy,
-    http.globalAgent
+    https.globalAgent
   );
 };

@@ -9,6 +9,14 @@ import type {
 import Agent from './Agent';
 
 class HttpsProxyAgent extends Agent {
+  // eslint-disable-next-line unicorn/prevent-abbreviations
+  constructor (...args: *) {
+    super(...args);
+
+    this.protocol = 'https:';
+    this.defaultPort = 443;
+  }
+
   createConnection (configuration: ConnectionConfigurationType, callback: ConnectionCallbackType) {
     const socket = net.connect(
       configuration.proxy.port,

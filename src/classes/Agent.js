@@ -14,6 +14,8 @@ const log = Logger.child({
 });
 
 class Agent {
+  defaultPort: number;
+
   protocol: ProtocolType;
 
   fallbackAgent: AgentType;
@@ -22,8 +24,7 @@ class Agent {
 
   getUrlProxy: GetUrlProxyMethodType;
 
-  constructor (protocol: ProtocolType, mustUrlUseProxy: MustUrlUseProxyMethodType, getUrlProxy: GetUrlProxyMethodType, fallbackAgent: AgentType) {
-    this.protocol = protocol;
+  constructor (mustUrlUseProxy: MustUrlUseProxyMethodType, getUrlProxy: GetUrlProxyMethodType, fallbackAgent: AgentType) {
     this.fallbackAgent = fallbackAgent;
     this.mustUrlUseProxy = mustUrlUseProxy;
     this.getUrlProxy = getUrlProxy;
@@ -38,11 +39,13 @@ class Agent {
     });
 
     if (this.mustUrlUseProxy(requestUrl)) {
-      request.path = requestUrl;
+      if (this.protocol === 'http:') {
+        request.path = requestUrl;
+      }
 
       const proxy = this.getUrlProxy(requestUrl);
 
-      log.trace('proxying request to %s use %s proxy', requestUrl, 'http://' + proxy.hostname + ':' + proxy.port);
+      log.trace('proxying request to %s using %s proxy', requestUrl, 'http://' + proxy.hostname + ':' + proxy.port);
 
       request.shouldKeepAlive = false;
 
