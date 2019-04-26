@@ -40,7 +40,7 @@ class Agent {
     if (this.mustUrlUseProxy(requestUrl)) {
       const proxy = this.getUrlProxy(requestUrl);
 
-      log.trace('proxying request to %s', requestUrl);
+      log.trace('proxying request to %s use %s proxy', requestUrl, 'http://' + proxy.hostname + ':' + proxy.port);
 
       request.shouldKeepAlive = false;
 

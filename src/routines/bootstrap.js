@@ -36,6 +36,10 @@ export default () => {
   // eslint-disable-next-line no-process-env
   global.GLOBAL_AGENT.NO_PROXY = process.env.GLOBAL_AGENT_NO_PROXY || null;
 
+  log.info({
+    configuration: global.GLOBAL_AGENT
+  }, 'global agent has been initialized');
+
   const mustUrlUseProxy = (url) => {
     if (!global.GLOBAL_AGENT.HTTP_PROXY) {
       return false;
