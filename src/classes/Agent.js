@@ -47,7 +47,7 @@ class Agent {
       request.shouldKeepAlive = false;
 
       const connectionConfiguration = {
-        host: configuration.hostname,
+        host: configuration.hostname || configuration.host,
         port: configuration.port || 80,
         proxy
       };
