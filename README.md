@@ -72,14 +72,14 @@ All `global-agent` configuration is available under `global.GLOBAL_AGENT` namesp
 
 ### Exclude URLs
 
-The `GLOBAL_AGENT_NO_PROXY` environment variable specifies URLs that should be excluded from proxying. `GLOBAL_AGENT_NO_PROXY` value is a comma-separated list of hostnames, domain names, or a mixture of both. Asterisks can be used as wildcards, but other clients may not support that. Domain names may be indicated by a leading dot, e.g.
+The `GLOBAL_AGENT_NO_PROXY` environment variable specifies URLs that should be excluded from proxying. `GLOBAL_AGENT_NO_PROXY` value is a comma-separated list of domain names. Asterisks can be used as wildcards, e.g.
 
 ```bash
-export GLOBAL_AGENT_NO_PROXY='*.foo.com,.baz.com'
+export GLOBAL_AGENT_NO_PROXY='*.foo.com,baz.com'
 
 ```
 
-says to contact all machines in the 'foo.com' and 'baz.com' domains directly.
+says to contact all machines with the 'foo.com' TLD and 'baz.com' domains directly.
 
 ### Enable logging
 
