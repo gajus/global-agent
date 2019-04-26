@@ -11,6 +11,10 @@ test('extracts port', (t) => {
   t.assert(parseProxyUrl('http://0.0.0.0:3000').port === 3000);
 });
 
+test('extracts authorization', (t) => {
+  t.assert(parseProxyUrl('http://foo:bar@0.0.0.0').authorization === 'foo:bar');
+});
+
 test('throws an error if protocol is not "http:"', (t) => {
   t.throws(() => {
     parseProxyUrl('https://0.0.0.0:3000');

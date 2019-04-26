@@ -33,11 +33,15 @@ class Agent {
     const requestUrl = this.protocol + '//' + configuration.hostname + (configuration.port === 80 || configuration.port === 443 ? '' : ':' + configuration.port) + request.path;
 
     if (this.mustUrlUseProxy(requestUrl)) {
+      const proxy = this.getUrlProxy(requestUrl);
+
       if (this.protocol === 'http:') {
         request.path = requestUrl;
-      }
 
-      const proxy = this.getUrlProxy(requestUrl);
+        if (proxy.authorization) {
+          request.setHeader('Proxy-Authorization', 'Basic ' + Buffer.from(proxy.authorization).toString('base64'));
+        }
+      }
 
       log.trace({
         destination: requestUrl,

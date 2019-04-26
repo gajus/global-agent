@@ -14,6 +14,7 @@ import {
 } from 'https';
 
 export type ProxyConfigurationType = {|
+  +authorization: string,
   +hostname: string,
   +port: number
 |};

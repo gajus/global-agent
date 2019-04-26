@@ -29,6 +29,7 @@ export default (url: string) => {
   }
 
   return {
+    authorization: urlTokens.auth || null,
     hostname: urlTokens.hostname,
     port
   };
