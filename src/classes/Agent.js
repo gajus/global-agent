@@ -45,7 +45,10 @@ class Agent {
 
       const proxy = this.getUrlProxy(requestUrl);
 
-      log.trace('proxying request to %s using %s proxy', requestUrl, 'http://' + proxy.hostname + ':' + proxy.port);
+      log.trace({
+        destination: requestUrl,
+        proxy: 'http://' + proxy.hostname + ':' + proxy.port
+      }, 'proxying request');
 
       request.shouldKeepAlive = false;
 
@@ -64,6 +67,10 @@ class Agent {
         }
       });
     } else {
+      log.trace({
+        destination: requestUrl
+      }, 'not proxying request; request URL matches NO_PROXY');
+
       // $FlowFixMe It appears that Flow is missing the method description.
       this.fallbackAgent.addRequest(request, configuration);
     }
