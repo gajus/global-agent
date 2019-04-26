@@ -32,6 +32,10 @@ Code:
 ```js
 import 'global-agent/bootstrap';
 
+// or:
+// import {bootstrap} from 'global-agent';
+// bootstrap();
+
 ```
 
 Bash:
