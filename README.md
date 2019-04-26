@@ -10,6 +10,8 @@ Global HTTP/HTTPS proxy configurable using environment variables.
 
 * [Usage](#usage)
   * [Setup proxy](#setup-proxy)
+  * [Runtime configuration](#runtime-configuration)
+  * [Exclude URLs](#exclude-urls)
   * [Enable logging](#enable-logging)
 * [Supported libraries](#supported-libraries)
 * [FAQ](#faq)
