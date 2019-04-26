@@ -5,6 +5,9 @@
 import http from 'http';
 import https from 'https';
 import getPort from 'get-port';
+import got from 'got';
+import axios from 'axios';
+import makeRequest from 'request';
 import AnyProxy, {
   ProxyServer
 } from 'anyproxy';
@@ -189,4 +192,84 @@ test('forwards requests matching NO_PROXY', async (t) => {
   });
 
   t.assert(response.body === 'DIRECT');
+});
+
+test('proxies HTTP request (using got)', async (t) => {
+  bootstrap();
+
+  const proxyServer = await createProxyServer();
+
+  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+
+  const response = await got('http://127.0.0.1');
+
+  t.assert(response.body === 'OK');
+});
+
+test('proxies HTTPS request (using got)', async (t) => {
+  bootstrap();
+
+  const proxyServer = await createProxyServer();
+
+  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+
+  const response = await got('https://127.0.0.1');
+
+  t.assert(response.body === 'OK');
+});
+
+test('proxies HTTP request (using axios)', async (t) => {
+  bootstrap();
+
+  const proxyServer = await createProxyServer();
+
+  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+
+  const response = await axios.get('http://127.0.0.1');
+
+  t.assert(response.data === 'OK');
+});
+
+test('proxies HTTPS request (using axios)', async (t) => {
+  bootstrap();
+
+  const proxyServer = await createProxyServer();
+
+  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+
+  const response = await axios.get('https://127.0.0.1');
+
+  t.assert(response.data === 'OK');
+});
+
+test('proxies HTTP request (using request)', async (t) => {
+  bootstrap();
+
+  const proxyServer = await createProxyServer();
+
+  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+
+  const response = await new Promise((resolve) => {
+    makeRequest('http://127.0.0.1', (error, requestResponse, body) => {
+      resolve(body);
+    });
+  });
+
+  t.assert(response === 'OK');
+});
+
+test('proxies HTTPS request (using request)', async (t) => {
+  bootstrap();
+
+  const proxyServer = await createProxyServer();
+
+  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+
+  const response = await new Promise((resolve) => {
+    makeRequest('https://127.0.0.1', (error, requestResponse, body) => {
+      resolve(body);
+    });
+  });
+
+  t.assert(response === 'OK');
 });
