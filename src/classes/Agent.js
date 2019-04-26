@@ -1,6 +1,5 @@
 // @flow
 
-import url from 'url';
 import Logger from '../Logger';
 import type {
   AgentType,
@@ -31,12 +30,7 @@ class Agent {
   }
 
   addRequest (request: *, configuration: *) {
-    const requestUrl = url.format({
-      hostname: configuration.hostname || configuration.host,
-      pathname: request.path,
-      port: configuration.port === 80 ? undefined : configuration.port,
-      protocol: this.protocol
-    });
+    const requestUrl = this.protocol + '//' + configuration.hostname + (configuration.port === 80 || configuration.port === 443 ? '' : ':' + configuration.port) + request.path;
 
     if (this.mustUrlUseProxy(requestUrl)) {
       if (this.protocol === 'http:') {
