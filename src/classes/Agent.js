@@ -12,6 +12,8 @@ const log = Logger.child({
   namespace: 'Agent'
 });
 
+let requestId = 0;
+
 class Agent {
   defaultPort: number;
 
@@ -33,6 +35,8 @@ class Agent {
     const requestUrl = this.protocol + '//' + configuration.hostname + (configuration.port === 80 || configuration.port === 443 ? '' : ':' + configuration.port) + request.path;
 
     if (this.mustUrlUseProxy(requestUrl)) {
+      const currentRequestId = requestId++;
+
       const proxy = this.getUrlProxy(requestUrl);
 
       if (this.protocol === 'http:') {
@@ -45,8 +49,17 @@ class Agent {
 
       log.trace({
         destination: requestUrl,
-        proxy: 'http://' + proxy.hostname + ':' + proxy.port
+        proxy: 'http://' + proxy.hostname + ':' + proxy.port,
+        requestId: currentRequestId
       }, 'proxying request');
+
+      request.once('response', (response) => {
+        log.trace({
+          headers: response.headers,
+          requestId: currentRequestId,
+          statusCode: response.statusCode
+        }, 'proxying response');
+      });
 
       request.shouldKeepAlive = false;
 

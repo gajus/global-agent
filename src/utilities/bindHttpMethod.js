@@ -3,9 +3,12 @@
 import http from 'http';
 import https from 'https';
 
-export default (originalMethod, agent) => {
+type AgentType = http.Agent | https.Agent;
+
+// eslint-disable-next-line flowtype/no-weak-types
+export default (originalMethod: Function, agent: AgentType) => {
   // eslint-disable-next-line unicorn/prevent-abbreviations
-  return (...args) => {
+  return (...args: *) => {
     let url;
     let options;
     let callback;
