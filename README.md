@@ -89,11 +89,11 @@ says to contact all machines with the 'foo.com' TLD and 'baz.com' domains direct
 
 ### Enable logging
 
-`global-agent` is using [`roarr`](https://www.npmjs.com/package/roarr) logger to log HTTP requests, e.g.
+`global-agent` is using [`roarr`](https://www.npmjs.com/package/roarr) logger to log HTTP requests and response (HTTP status code and headers), e.g.
 
 ```json
-{"context":{"program":"global-agent","namespace":"Agent","logLevel":10,"destination":"https://dev.to:443/api/tags%3Fpage=1","proxy":"http://127.0.0.1:8076"},"message":"proxying request","sequence":23,"time":1556269669663,"version":"1.0.0"}
-{"context":{"program":"global-agent","namespace":"Agent","logLevel":10,"destination":"https://dev.to:443/api/tags%3Fpage=2","proxy":"http://127.0.0.1:8076"},"message":"proxying request","sequence":24,"time":1556269670311,"version":"1.0.0"}
+{"context":{"program":"global-agent","namespace":"Agent","logLevel":10,"destination":"http://gajus.com","proxy":"http://127.0.0.1:8076"},"message":"proxying request","sequence":1,"time":1556269669663,"version":"1.0.0"}
+{"context":{"program":"global-agent","namespace":"Agent","logLevel":10,"headers":{"content-type":"text/plain","content-length":"2","date":"Fri, 26 Apr 2019 12:07:50 GMT","connection":"close"},"requestId":6,"statusCode":200},"message":"proxying response","sequence":2,"time":1557133856955,"version":"1.0.0"}
 
 ```
 
@@ -119,7 +119,10 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
 
 ### What versions of Node.js are supported?
 
-`global-agent` works with Node.js [v11.7.0](https://nodejs.org/uk/blog/release/v11.7.0/) and above.
+`global-agent` has been tested to work with Node v10 and above.
+
+* `global-agent` works with Node.js [v11.7.0](https://nodejs.org/uk/blog/release/v11.7.0/) and above by overriding the `http(s).globalAgent`.
+* `global-agent` works with Node.js v11.6 and below by overriding the `http(s).get` and `http(s).request` methods.
 
 ### What is the reason `global-agent` does not use `HTTP_PROXY`?
 
@@ -129,4 +132,4 @@ Some libraries (e.g. [`request`](https://npmjs.org/package/request)) change thei
 
 [`global-tunnel`](https://github.com/salesforce/global-tunnel) (including [`global-tunnel-ng`](https://github.com/np-maintain/global-tunnel) and [`tunnel`](https://npmjs.com/package/tunnel)) are designed to support legacy Node.js versions. They use various [workarounds](https://github.com/koichik/node-tunnel/blob/5fb2fb424788597146b7be6729006cad1cf9e9a8/lib/tunnel.js#L134-L144) and rely on [monkey-patching `http.request`, `http.get`, `https.request` and `https.get` methods](https://github.com/np-maintain/global-tunnel/blob/51413dcf0534252b5049ec213105c7063ccc6367/index.js#L302-L338).
 
-In contrast, `global-agent` supports only Node.js v11.7.0 and above, and works by configuring [`http.globalAgent`](https://nodejs.org/api/http.html#http_http_globalagent).
+In contrast, `global-agent` supports Node.js v10 and above, and does not implements workarounds for the older Node.js versions.
