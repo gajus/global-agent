@@ -119,7 +119,7 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
 
 ### What versions of Node.js are supported?
 
-`global-agent` works with Node.js v12.0.0 and above.
+`global-agent` works with Node.js v11.7.0 and above.
 
 ### What is the reason `global-agent` does not use `HTTP_PROXY`?
 
@@ -129,4 +129,4 @@ Some libraries (e.g. [`request`](https://npmjs.org/package/request)) change thei
 
 [`global-tunnel`](https://github.com/salesforce/global-tunnel) (including [`global-tunnel-ng`](https://github.com/np-maintain/global-tunnel) and [`tunnel`](https://npmjs.com/package/tunnel)) are designed to support legacy Node.js versions. They use various [workarounds](https://github.com/koichik/node-tunnel/blob/5fb2fb424788597146b7be6729006cad1cf9e9a8/lib/tunnel.js#L134-L144) and rely on [monkey-patching `http.request`, `http.get`, `https.request` and `https.get` methods](https://github.com/np-maintain/global-tunnel/blob/51413dcf0534252b5049ec213105c7063ccc6367/index.js#L302-L338).
 
-In contrast, `global-agent` supports only Node.js v12 and above, and works by configuring [`http.globalAgent`](https://nodejs.org/api/http.html#http_http_globalagent).
+In contrast, `global-agent` supports only Node.js v11.7.0 and above, and works by configuring [`http.globalAgent`](https://nodejs.org/api/http.html#http_http_globalagent).
