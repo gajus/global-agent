@@ -13,6 +13,7 @@ Global HTTP/HTTPS proxy configurable using environment variables.
   * [Runtime configuration](#runtime-configuration)
   * [Exclude URLs](#exclude-urls)
   * [Enable logging](#enable-logging)
+  * [Events](#events)
 * [Supported libraries](#supported-libraries)
 * [FAQ](#faq)
   * [How does it work?](#how-does-it-work)
@@ -100,6 +101,26 @@ says to contact all machines with the 'foo.com' TLD and 'baz.com' domains direct
 Export `ROARR_LOG=true` environment variable to enable log printing to stdout.
 
 Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print the logs.
+
+### Events
+
+`global.GLOBAL_AGENT.eventEmitter` is an instance of a Node.js [event emitter](https://nodejs.org/api/events.html).
+
+* `request` event is emitted when a new HTTP request is proxied usign `global-agent` HTTP(S) agent.
+
+Example:
+
+```js
+global.GLOBAL_AGENT.eventEmitter.on('request', (request) => {
+  request.once('response', (response) => {
+    console.log({
+      request,
+      response
+    });
+  });
+});
+
+```
 
 ## Supported libraries
 

@@ -1,5 +1,6 @@
 // @flow
 
+import EventEmitter from 'events';
 import http from 'http';
 import https from 'https';
 import semver from 'semver';
@@ -62,16 +63,20 @@ export default () => {
     return parseProxyUrl(global.GLOBAL_AGENT.HTTP_PROXY);
   };
 
+  const eventEmitter = new EventEmitter();
+
   const httpAgent = new HttpProxyAgent(
     mustUrlUseProxy,
     getUrlProxy,
-    http.globalAgent
+    http.globalAgent,
+    eventEmitter
   );
 
   const httpsAgent = new HttpsProxyAgent(
     mustUrlUseProxy,
     getUrlProxy,
-    https.globalAgent
+    https.globalAgent,
+    eventEmitter
   );
 
   // Overriding globalAgent was added in v11.7.
