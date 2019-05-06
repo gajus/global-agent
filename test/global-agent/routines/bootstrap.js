@@ -251,6 +251,8 @@ test('proxies HTTP request (using request)', async (t) => {
 
   const response = await new Promise((resolve) => {
     makeRequest('http://127.0.0.1', (error, requestResponse, body) => {
+      t.assert(error === null);
+
       resolve(body);
     });
   });
@@ -267,6 +269,8 @@ test('proxies HTTPS request (using request)', async (t) => {
 
   const response = await new Promise((resolve) => {
     makeRequest('https://127.0.0.1', (error, requestResponse, body) => {
+      t.assert(error === null);
+
       resolve(body);
     });
   });

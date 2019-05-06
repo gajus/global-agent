@@ -14,6 +14,7 @@
     "es6-error": "^4.1.1",
     "matcher": "^2.0.0",
     "roarr": "^2.13.0",
+    "semver": "^6.0.0",
     "serialize-error": "^4.1.0"
   },
   "description": "Global HTTP/HTTPS proxy configurable using environment variables.",
@@ -44,7 +45,7 @@
     "sinon": "^7.3.2"
   },
   "engines": {
-    "node": ">=11.0"
+    "node": ">=10.0"
   },
   "husky": {
     "hooks": {

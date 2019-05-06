@@ -119,7 +119,7 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
 
 ### What versions of Node.js are supported?
 
-`global-agent` works with Node.js v11.7.0 and above.
+`global-agent` works with Node.js [v11.7.0](https://nodejs.org/uk/blog/release/v11.7.0/) and above.
 
 ### What is the reason `global-agent` does not use `HTTP_PROXY`?
 
