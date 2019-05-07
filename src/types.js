@@ -28,6 +28,7 @@ export type ConnectionConfigurationType = {|
 export type ConnectionCallbackType = (error: Error | null, socket: Socket | TLSSocket) => void;
 
 export type AgentType = HttpAgent | HttpsAgent;
+export type IsProxyConfiguredMethodType = () => boolean;
 export type MustUrlUseProxyMethodType = (url: string) => boolean;
 export type GetUrlProxyMethodType = (url: string) => ProxyConfigurationType;
 export type ProtocolType = 'http:' | 'https:';

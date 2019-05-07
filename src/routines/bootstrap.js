@@ -43,6 +43,10 @@ export default () => {
     configuration: global.GLOBAL_AGENT
   }, 'global agent has been initialized');
 
+  const isProxyConfigured = () => {
+    return global.GLOBAL_AGENT.HTTP_PROXY;
+  };
+
   const mustUrlUseProxy = (url) => {
     if (!global.GLOBAL_AGENT.HTTP_PROXY) {
       return false;
@@ -66,6 +70,7 @@ export default () => {
   const eventEmitter = new EventEmitter();
 
   const httpAgent = new HttpProxyAgent(
+    isProxyConfigured,
     mustUrlUseProxy,
     getUrlProxy,
     http.globalAgent,
@@ -73,6 +78,7 @@ export default () => {
   );
 
   const httpsAgent = new HttpsProxyAgent(
+    isProxyConfigured,
     mustUrlUseProxy,
     getUrlProxy,
     https.globalAgent,
