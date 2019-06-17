@@ -89,6 +89,10 @@ export GLOBAL_AGENT_NO_PROXY='*.foo.com,baz.com'
 
 says to contact all machines with the 'foo.com' TLD and 'baz.com' domains directly.
 
+### Separate proxy for HTTPS
+
+The environment variable `GLOBAL_AGENT_HTTPS_PROXY` can be set to specify a separate proxy for HTTPS requests. When this variable is not set `GLOBAL_AGENT_HTTP_PROXY` is used for both HTTP and HTTPS requests.
+
 ### Enable logging
 
 `global-agent` is using [`roarr`](https://www.npmjs.com/package/roarr) logger to log HTTP requests and response (HTTP status code and headers), e.g.

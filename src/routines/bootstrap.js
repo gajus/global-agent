@@ -37,50 +37,66 @@ export default () => {
   global.GLOBAL_AGENT.HTTP_PROXY = process.env.GLOBAL_AGENT_HTTP_PROXY || null;
 
   // eslint-disable-next-line no-process-env
+  global.GLOBAL_AGENT.HTTPS_PROXY = process.env.GLOBAL_AGENT_HTTPS_PROXY || null;
+
+  // eslint-disable-next-line no-process-env
   global.GLOBAL_AGENT.NO_PROXY = process.env.GLOBAL_AGENT_NO_PROXY || null;
 
   log.info({
     configuration: global.GLOBAL_AGENT
   }, 'global agent has been initialized');
 
-  const isProxyConfigured = () => {
-    return global.GLOBAL_AGENT.HTTP_PROXY;
+  const isProxyConfigured = (getProxy) => {
+    return () => {
+      return getProxy();
+    };
   };
 
-  const mustUrlUseProxy = (url) => {
-    if (!global.GLOBAL_AGENT.HTTP_PROXY) {
-      return false;
-    }
+  const mustUrlUseProxy = (getProxy) => {
+    return (url) => {
+      if (!getProxy()) {
+        return false;
+      }
 
-    if (!global.GLOBAL_AGENT.NO_PROXY) {
-      return true;
-    }
+      if (!global.GLOBAL_AGENT.NO_PROXY) {
+        return true;
+      }
 
-    return !isUrlMatchingNoProxy(url, global.GLOBAL_AGENT.NO_PROXY);
+      return !isUrlMatchingNoProxy(url, global.GLOBAL_AGENT.NO_PROXY);
+    };
   };
 
-  const getUrlProxy = () => {
-    if (!global.GLOBAL_AGENT.HTTP_PROXY) {
-      throw new UnexpectedStateError('HTTP proxy must be configured.');
-    }
+  const getUrlProxy = (getProxy) => {
+    return () => {
+      const proxy = getProxy();
+      if (!proxy) {
+        throw new UnexpectedStateError('HTTP(S) proxy must be configured.');
+      }
 
-    return parseProxyUrl(global.GLOBAL_AGENT.HTTP_PROXY);
+      return parseProxyUrl(proxy);
+    };
   };
 
   const eventEmitter = new EventEmitter();
 
+  const getHttpProxy = () => {
+    return global.GLOBAL_AGENT.HTTP_PROXY;
+  };
   const httpAgent = new HttpProxyAgent(
-    isProxyConfigured,
-    mustUrlUseProxy,
-    getUrlProxy,
+    isProxyConfigured(getHttpProxy),
+    mustUrlUseProxy(getHttpProxy),
+    getUrlProxy(getHttpProxy),
     http.globalAgent,
     eventEmitter
   );
 
+  const getHttpsProxy = () => {
+    return global.GLOBAL_AGENT.HTTPS_PROXY || global.GLOBAL_AGENT.HTTP_PROXY;
+  };
   const httpsAgent = new HttpsProxyAgent(
-    isProxyConfigured,
-    mustUrlUseProxy,
-    getUrlProxy,
+    isProxyConfigured(getHttpsProxy),
+    mustUrlUseProxy(getHttpsProxy),
+    getUrlProxy(getHttpsProxy),
     https.globalAgent,
     eventEmitter
   );
