@@ -96,25 +96,37 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
     return proxyController.HTTP_PROXY;
   };
 
-  const httpAgent = new HttpProxyAgent(
-    isProxyConfigured(getHttpProxy),
-    mustUrlUseProxy(getHttpProxy),
-    getUrlProxy(getHttpProxy),
-    http.globalAgent,
-    eventEmitter
-  );
+  const BoundHttpProxyAgent = class extends HttpProxyAgent {
+    constructor () {
+      super(
+        isProxyConfigured(getHttpProxy),
+        mustUrlUseProxy(getHttpProxy),
+        getUrlProxy(getHttpProxy),
+        http.globalAgent,
+        eventEmitter
+      );
+    }
+  };
+
+  const httpAgent = new BoundHttpProxyAgent();
 
   const getHttpsProxy = () => {
     return proxyController.HTTPS_PROXY || proxyController.HTTP_PROXY;
   };
 
-  const httpsAgent = new HttpsProxyAgent(
-    isProxyConfigured(getHttpsProxy),
-    mustUrlUseProxy(getHttpsProxy),
-    getUrlProxy(getHttpsProxy),
-    https.globalAgent,
-    eventEmitter
-  );
+  const BoundHttpsProxyAgent = class extends HttpsProxyAgent {
+    constructor () {
+      super(
+        isProxyConfigured(getHttpsProxy),
+        mustUrlUseProxy(getHttpsProxy),
+        getUrlProxy(getHttpsProxy),
+        https.globalAgent,
+        eventEmitter
+      );
+    }
+  };
+
+  const httpsAgent = new BoundHttpsProxyAgent();
 
   // Overriding globalAgent was added in v11.7.
   // @see https://nodejs.org/uk/blog/release/v11.7.0/
