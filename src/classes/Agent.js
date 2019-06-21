@@ -46,7 +46,7 @@ class Agent {
   }
 
   addRequest (request: *, configuration: *) {
-    const requestUrl = this.protocol + '//' + configuration.hostname + (configuration.port === 80 || configuration.port === 443 ? '' : ':' + configuration.port) + request.path;
+    const requestUrl = this.protocol + '//' + (configuration.hostname || configuration.host) + (configuration.port === 80 || configuration.port === 443 ? '' : ':' + configuration.port) + request.path;
 
     if (!this.isProxyConfigured()) {
       log.trace({

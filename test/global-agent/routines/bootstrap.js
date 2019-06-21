@@ -164,6 +164,7 @@ test('proxies HTTP request', async (t) => {
   t.assert(response.body === 'OK');
 });
 
+
 test('proxies HTTPS request', async (t) => {
   bootstrap({});
 
@@ -221,6 +222,22 @@ test('forwards requests matching NO_PROXY', async (t) => {
   });
 
   t.assert(response.body === 'DIRECT');
+});
+
+test('proxies HTTP request (using http.get(host))', async (t) => {
+  bootstrap({});
+
+  const proxyServer = await createProxyServer();
+
+  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+
+  const response = await new Promise((resolve) => {
+    http.get({
+      host: '127.0.0.1'
+    }, createHttpResponseResolver(resolve));
+  });
+
+  t.assert(response.body === 'OK');
 });
 
 test('proxies HTTP request (using got)', async (t) => {
