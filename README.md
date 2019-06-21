@@ -16,6 +16,8 @@ Global HTTP/HTTPS proxy configurable using environment variables.
   * [Exclude URLs](#exclude-urls)
   * [Enable logging](#enable-logging)
   * [Events](#events)
+* [API](#api)
+  * [`global.GLOBAL_AGENT`](#globalglobal-agent)
 * [Supported libraries](#supported-libraries)
 * [FAQ](#faq)
   * [How does it work?](#how-does-it-work)
@@ -114,7 +116,7 @@ All `global-agent` configuration is available under `global.GLOBAL_AGENT` namesp
 
 ### Exclude URLs
 
-The `GLOBAL_AGENT_NO_PROXY` environment variable specifies URLs that should be excluded from proxying. `GLOBAL_AGENT_NO_PROXY` value is a comma-separated list of domain names. Asterisks can be used as wildcards, e.g.
+The `GLOBAL_AGENT_NO_PROXY` environment variable specifies a pattern of URLs that should be excluded from proxying. `GLOBAL_AGENT_NO_PROXY` value is a comma-separated list of domain names. Asterisks can be used as wildcards, e.g.
 
 ```bash
 export GLOBAL_AGENT_NO_PROXY='*.foo.com,baz.com'
@@ -160,6 +162,20 @@ global.GLOBAL_AGENT.eventEmitter.on('request', (request) => {
 });
 
 ```
+
+## API
+
+### `global.GLOBAL_AGENT`
+
+`global.GLOBAL_AGENT` is initialized by `bootstrap` routine.
+
+`global.GLOBAL_AGENT` has the following properties:
+
+|Name|Description|Configurable|
+|---|---|---|
+|`HTTP_PROXY`|Yes|Sets HTTP proxy to use.|
+|`HTTPS_PROXY`|Yes|Sets a distinct proxy to use for HTTPS requests.|
+|`NO_PROXY`|Yes|Specifies a pattern of URLs that should be excluded from proxying. See [Exclude URLs](#exclude-urls).|
 
 ## Supported libraries
 
