@@ -17,7 +17,7 @@ Global HTTP/HTTPS proxy configurable using environment variables.
   * [Enable logging](#enable-logging)
   * [Events](#events)
 * [API](#api)
-  * [`global.GLOBAL_AGENT`](#globalglobal-agent)
+  * [`global.GLOBAL_AGENT`](#globalglobal_agent)
 * [Supported libraries](#supported-libraries)
 * [FAQ](#faq)
   * [How does it work?](#how-does-it-work)
