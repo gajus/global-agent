@@ -74,7 +74,7 @@ global.GLOBAL_AGENT.HTTP_PROXY = 'http://127.0.0.1:8002';
 
 ```
 
-First HTTP request is going to use http://127.0.0.1:8001 proxy and secord request is going to use http://127.0.0.1:8002.
+The first HTTP request is going to use http://127.0.0.1:8001 proxy and the secord request is going to use http://127.0.0.1:8002.
 
 All `global-agent` configuration is available under `global.GLOBAL_AGENT` namespace.
 
@@ -150,7 +150,7 @@ global.GLOBAL_AGENT.eventEmitter.on('request', (request) => {
 * `global-agent` works with Node.js [v11.7.0](https://nodejs.org/uk/blog/release/v11.7.0/) and above by overriding the `http(s).globalAgent`.
 * `global-agent` works with Node.js v11.6 and below by overriding the `http(s).get` and `http(s).request` methods.
 
-### What is the reason `global-agent` does not use `HTTP_PROXY`?
+### What is the reason `global-agent/bootstrap` does not use `HTTP_PROXY`?
 
 Some libraries (e.g. [`request`](https://npmjs.org/package/request)) change their behaviour when `HTTP_PROXY` environment variable is present. Using a namespaced environment variable prevents conflicting library behaviour.
 
