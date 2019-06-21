@@ -3,7 +3,7 @@
 import Logger from '../Logger';
 
 const log = Logger.child({
-  namespace: 'bootstrap'
+  namespace: 'createGlobalAgentGlobal'
 });
 
 const KNOWN_PROPERTY_NAMES = [
