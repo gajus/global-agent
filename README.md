@@ -71,7 +71,25 @@ bootstrap();
 
 ```
 
-This is useful if you need to conditionally bootstrap `global-agent`.
+This is useful if you need to conditionally bootstrap `global-agent`, e.g.
+
+```js
+import {
+  bootstrap
+} from 'global-agent';
+import globalTunner from 'global-tunnel-ng';
+
+const MAJOR_NODEJS_VERSION = parseInt(process.version.slice(1).split('.')[0], 10);
+
+if (MAJOR_NODEJS_VERSION >= 10) {
+  // `global-agent` works with Node.js v10 and above.
+  bootstrap();
+} else {
+  // `global-tunnel-ng` works only with Node.js v10 and below.
+  globalTunnel.initialize();
+}
+
+```
 
 ### Runtime configuration
 
