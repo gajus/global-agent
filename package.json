@@ -5,43 +5,52 @@
     "url": "http://gajus.com"
   },
   "ava": {
+    "files": [
+      "test/**/*"
+    ],
+    "helpers": [
+      "test/helpers/**/*"
+    ],
     "require": [
       "@babel/register"
+    ],
+    "sources": [
+      "src/**/*"
     ]
   },
   "dependencies": {
-    "core-js": "^3.0.1",
+    "core-js": "^3.1.4",
     "es6-error": "^4.1.1",
     "matcher": "^2.0.0",
-    "roarr": "^2.13.0",
-    "semver": "^6.0.0",
+    "roarr": "^2.13.2",
+    "semver": "^6.1.1",
     "serialize-error": "^4.1.0"
   },
   "description": "Global HTTP/HTTPS proxy configurable using environment variables.",
   "devDependencies": {
     "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.4",
-    "@babel/node": "^7.2.2",
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
     "@babel/plugin-transform-flow-strip-types": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
     "@babel/register": "^7.4.4",
     "anyproxy": "^4.1.0",
-    "ava": "^1.4.1",
-    "axios": "^0.18.0",
+    "ava": "^2.1.0",
+    "axios": "^0.19.0",
     "babel-plugin-istanbul": "^5.1.4",
     "babel-plugin-transform-export-default-name": "^2.0.4",
-    "coveralls": "^3.0.3",
+    "coveralls": "^3.0.4",
     "eslint": "^5.16.0",
-    "eslint-config-canonical": "^17.0.1",
-    "flow-bin": "^0.98.0",
-    "flow-copy-source": "^2.0.4",
+    "eslint-config-canonical": "^17.1.1",
+    "flow-bin": "^0.101.1",
+    "flow-copy-source": "^2.0.6",
     "get-port": "^5.0.0",
     "got": "^9.6.0",
-    "husky": "^2.2.0",
-    "nyc": "^14.1.0",
+    "husky": "^2.4.1",
+    "nyc": "^14.1.1",
     "pem": "^1.14.2",
     "request": "^2.88.0",
-    "semantic-release": "^15.13.3",
+    "semantic-release": "^15.13.16",
     "sinon": "^7.3.2"
   },
   "engines": {
