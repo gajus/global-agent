@@ -10,7 +10,7 @@
 Global HTTP/HTTPS proxy configurable using environment variables.
 
 * [Usage](#usage)
-  * [Setup proxy using `global-agent/bootstrap`](#setup-proxy-using-global-agent-bootstrap)
+  * [Setup proxy using `global-agent/bootstrap`](#setup-proxy-using-global-agentbootstrap)
   * [Runtime configuration](#runtime-configuration)
   * [Exclude URLs](#exclude-urls)
   * [Enable logging](#enable-logging)
