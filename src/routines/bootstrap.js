@@ -29,6 +29,10 @@ type ConfigurationType = {|
   +environmentVariableNamespace: string
 |};
 
+const defaultConfigurationInput = {
+  environmentVariableNamespace: undefined
+};
+
 const log = Logger.child({
   namespace: 'bootstrap'
 });
@@ -43,7 +47,7 @@ const createConfiguration = (configurationInput: ConfigurationInputType): Config
   };
 };
 
-export default (configurationInput: ConfigurationInputType) => {
+export default (configurationInput: ConfigurationInputType = defaultConfigurationInput) => {
   const configuration = createConfiguration(configurationInput);
 
   global.GLOBAL_AGENT = global.GLOBAL_AGENT || createGlobalAgentGlobal();
