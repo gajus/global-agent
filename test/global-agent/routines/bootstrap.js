@@ -178,6 +178,16 @@ test('proxies HTTPS request', async (t) => {
   t.assert(response.body === 'OK');
 });
 
+test('does not produce unhandled rejection when cannot connect to proxy', async (t) => {
+  bootstrap({});
+
+  const port = await getNextPort();
+
+  global.GLOBAL_AGENT.HTTP_PROXY = 'http://127.0.0.1:' + port;
+
+  await t.throwsAsync(got('http://127.0.0.1'));
+});
+
 test('proxies HTTPS request with dedicated proxy', async (t) => {
   bootstrap({});
 

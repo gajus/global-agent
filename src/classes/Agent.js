@@ -1,6 +1,7 @@
 // @flow
 
 import EventEmitter from 'events';
+import serializeError from 'serialize-error';
 import Logger from '../Logger';
 import type {
   AgentType,
@@ -111,6 +112,12 @@ class Agent {
       if (error) {
         request.emit('error', error);
       } else {
+        socket.on('error', (socketError) => {
+          log.error({
+            error: serializeError(socketError)
+          }, 'socket error');
+        });
+
         request.onSocket(socket);
       }
     });
