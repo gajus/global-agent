@@ -10,7 +10,7 @@
 Global HTTP/HTTPS proxy configurable using environment variables.
 
 * [Usage](#usage)
-  * [Setup proxy](#setup-proxy)
+  * [Setup proxy using `global-agent/bootstrap`](#setup-proxy-using-global-agent-bootstrap)
   * [Runtime configuration](#runtime-configuration)
   * [Exclude URLs](#exclude-urls)
   * [Enable logging](#enable-logging)
@@ -24,7 +24,7 @@ Global HTTP/HTTPS proxy configurable using environment variables.
 
 ## Usage
 
-### Setup proxy
+### Setup proxy using `global-agent/bootstrap`
 
 To configure HTTP proxy:
 
@@ -153,6 +153,15 @@ global.GLOBAL_AGENT.eventEmitter.on('request', (request) => {
 ### What is the reason `global-agent/bootstrap` does not use `HTTP_PROXY`?
 
 Some libraries (e.g. [`request`](https://npmjs.org/package/request)) change their behaviour when `HTTP_PROXY` environment variable is present. Using a namespaced environment variable prevents conflicting library behaviour.
+
+You can override this behaviour by configuring `GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE` variable, e.g.
+
+```bash
+$ export GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE=
+
+```
+
+Now script initialized using `global-agent/bootstrap` will use `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables.
 
 ### What is the difference from `global-tunnel` and `tunnel`?
 

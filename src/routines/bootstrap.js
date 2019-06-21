@@ -18,11 +18,31 @@ import {
   parseProxyUrl
 } from '../utilities';
 
+type ConfigurationInputType = {|
+  +environmentVariableNamespace?: string
+|};
+
+type ConfigurationType = {|
+  +environmentVariableNamespace: string
+|};
+
 const log = Logger.child({
   namespace: 'bootstrap'
 });
 
-export default () => {
+const createConfiguration = (configurationInput: ConfigurationInputType): ConfigurationType => {
+  // eslint-disable-next-line no-process-env
+  const DEFAULT_ENVIRONMENT_VARIABLE_NAMESPACE = typeof process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE === 'string' ? process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE : 'GLOBAL_AGENT_';
+
+  return {
+    ...configurationInput,
+    environmentVariableNamespace: typeof configurationInput.environmentVariableNamespace === 'string' ? configurationInput.environmentVariableNamespace : DEFAULT_ENVIRONMENT_VARIABLE_NAMESPACE
+  };
+};
+
+export default (configurationInput: ConfigurationInputType) => {
+  const configuration = createConfiguration(configurationInput);
+
   global.GLOBAL_AGENT = global.GLOBAL_AGENT || {};
 
   if (global.GLOBAL_AGENT.bootstrapped) {
@@ -34,13 +54,13 @@ export default () => {
   global.GLOBAL_AGENT.bootstrapped = true;
 
   // eslint-disable-next-line no-process-env
-  global.GLOBAL_AGENT.HTTP_PROXY = process.env.GLOBAL_AGENT_HTTP_PROXY || null;
+  global.GLOBAL_AGENT.HTTP_PROXY = process.env[configuration.environmentVariableNamespace + 'HTTP_PROXY'] || null;
 
   // eslint-disable-next-line no-process-env
-  global.GLOBAL_AGENT.HTTPS_PROXY = process.env.GLOBAL_AGENT_HTTPS_PROXY || null;
+  global.GLOBAL_AGENT.HTTPS_PROXY = process.env[configuration.environmentVariableNamespace + 'HTTPS_PROXY'] || null;
 
   // eslint-disable-next-line no-process-env
-  global.GLOBAL_AGENT.NO_PROXY = process.env.GLOBAL_AGENT_NO_PROXY || null;
+  global.GLOBAL_AGENT.NO_PROXY = process.env[configuration.environmentVariableNamespace + 'NO_PROXY'] || null;
 
   log.info({
     configuration: global.GLOBAL_AGENT

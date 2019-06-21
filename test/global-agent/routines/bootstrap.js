@@ -151,7 +151,7 @@ const createHttpServer = async () => {
 };
 
 test('proxies HTTP request', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
 
@@ -165,7 +165,7 @@ test('proxies HTTP request', async (t) => {
 });
 
 test('proxies HTTPS request', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
 
@@ -179,7 +179,7 @@ test('proxies HTTPS request', async (t) => {
 });
 
 test('proxies HTTPS request with dedicated proxy', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
 
@@ -193,7 +193,7 @@ test('proxies HTTPS request with dedicated proxy', async (t) => {
 });
 
 test('ignores dedicated HTTPS proxy for HTTP urls', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
 
@@ -208,7 +208,7 @@ test('ignores dedicated HTTPS proxy for HTTP urls', async (t) => {
 });
 
 test('forwards requests matching NO_PROXY', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
   const httpServer = await createHttpServer();
@@ -224,7 +224,7 @@ test('forwards requests matching NO_PROXY', async (t) => {
 });
 
 test('proxies HTTP request (using got)', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
 
@@ -236,7 +236,7 @@ test('proxies HTTP request (using got)', async (t) => {
 });
 
 test('proxies HTTPS request (using got)', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
 
@@ -248,7 +248,7 @@ test('proxies HTTPS request (using got)', async (t) => {
 });
 
 test('proxies HTTP request (using axios)', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
 
@@ -260,7 +260,7 @@ test('proxies HTTP request (using axios)', async (t) => {
 });
 
 test('proxies HTTPS request (using axios)', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
 
@@ -272,7 +272,7 @@ test('proxies HTTPS request (using axios)', async (t) => {
 });
 
 test('proxies HTTP request (using request)', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
 
@@ -290,7 +290,7 @@ test('proxies HTTP request (using request)', async (t) => {
 });
 
 test('proxies HTTPS request (using request)', async (t) => {
-  bootstrap();
+  bootstrap({});
 
   const proxyServer = await createProxyServer();
 
