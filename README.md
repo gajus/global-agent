@@ -93,6 +93,21 @@ if (MAJOR_NODEJS_VERSION >= 10) {
 
 ```
 
+### Setup proxy using `createGlobalProxyAgent`
+
+If you do not want to use `global.GLOBAL_AGENT` variable, then you can use `createGlobalProxyAgent` to instantiate a controlled instance of `global-agent`, e.g.
+
+```js
+import {
+  createGlobalProxyAgent
+} from 'global-agent';
+
+const globalProxyAgent = createGlobalProxyAgent();
+
+```
+
+Unlike `bootstrap` routine, `createGlobalProxyAgent` factory does not create `global.GLOBAL_AGENT` variable and does not guard against multiple initializations of `global-agent`. The result object of `createGlobalProxyAgent` is equivalent to `global.GLOBAL_AGENT`.
+
 ### Runtime configuration
 
 `global-agent/bootstrap` script copies `process.env.GLOBAL_AGENT_HTTP_PROXY` value to `global.GLOBAL_AGENT.HTTP_PROXY` and continues to use the latter variable.

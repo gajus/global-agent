@@ -16,7 +16,7 @@ import test, {
   afterEach,
   beforeEach
 } from 'ava';
-import bootstrap from '../../../src/routines/bootstrap';
+import createGlobalProxyAgent from '../../../src/factories/createGlobalProxyAgent';
 
 const defaultHttpAgent = http.globalAgent;
 const defaultHttpsAgent = https.globalAgent;
@@ -47,8 +47,6 @@ before(() => {
 });
 
 beforeEach(() => {
-  global.GLOBAL_AGENT = {};
-
   // $FlowFixMe
   http.globalAgent = defaultHttpAgent;
 
@@ -151,11 +149,11 @@ const createHttpServer = async () => {
 };
 
 test('proxies HTTP request', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response = await new Promise((resolve) => {
     http.get('http://127.0.0.1', createHttpResponseResolver(resolve));
@@ -165,11 +163,11 @@ test('proxies HTTP request', async (t) => {
 });
 
 test('proxies HTTPS request', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response = await new Promise((resolve) => {
     https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
@@ -179,21 +177,21 @@ test('proxies HTTPS request', async (t) => {
 });
 
 test('does not produce unhandled rejection when cannot connect to proxy', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const port = await getNextPort();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = 'http://127.0.0.1:' + port;
+  globalProxyAgent.HTTP_PROXY = 'http://127.0.0.1:' + port;
 
   await t.throwsAsync(got('http://127.0.0.1'));
 });
 
 test('proxies HTTPS request with dedicated proxy', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTPS_PROXY = proxyServer.url;
+  globalProxyAgent.HTTPS_PROXY = proxyServer.url;
 
   const response = await new Promise((resolve) => {
     https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
@@ -203,12 +201,12 @@ test('proxies HTTPS request with dedicated proxy', async (t) => {
 });
 
 test('ignores dedicated HTTPS proxy for HTTP urls', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
-  global.GLOBAL_AGENT.HTTPS_PROXY = 'http://example.org';
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.HTTPS_PROXY = 'http://example.org';
 
   const response = await new Promise((resolve) => {
     http.get('http://127.0.0.1', createHttpResponseResolver(resolve));
@@ -218,13 +216,13 @@ test('ignores dedicated HTTPS proxy for HTTP urls', async (t) => {
 });
 
 test('forwards requests matching NO_PROXY', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
   const httpServer = await createHttpServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
-  global.GLOBAL_AGENT.NO_PROXY = '127.0.0.1';
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.NO_PROXY = '127.0.0.1';
 
   const response = await new Promise((resolve) => {
     http.get(httpServer.url, createHttpResponseResolver(resolve));
@@ -234,11 +232,11 @@ test('forwards requests matching NO_PROXY', async (t) => {
 });
 
 test('proxies HTTP request (using http.get(host))', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response = await new Promise((resolve) => {
     http.get({
@@ -250,11 +248,11 @@ test('proxies HTTP request (using http.get(host))', async (t) => {
 });
 
 test('proxies HTTP request (using got)', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response = await got('http://127.0.0.1');
 
@@ -262,11 +260,11 @@ test('proxies HTTP request (using got)', async (t) => {
 });
 
 test('proxies HTTPS request (using got)', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response = await got('https://127.0.0.1');
 
@@ -274,11 +272,11 @@ test('proxies HTTPS request (using got)', async (t) => {
 });
 
 test('proxies HTTP request (using axios)', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response = await axios.get('http://127.0.0.1');
 
@@ -286,11 +284,11 @@ test('proxies HTTP request (using axios)', async (t) => {
 });
 
 test('proxies HTTPS request (using axios)', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response = await axios.get('https://127.0.0.1');
 
@@ -298,11 +296,11 @@ test('proxies HTTPS request (using axios)', async (t) => {
 });
 
 test('proxies HTTP request (using request)', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response = await new Promise((resolve) => {
     makeRequest('http://127.0.0.1', (error, requestResponse, body) => {
@@ -316,11 +314,11 @@ test('proxies HTTP request (using request)', async (t) => {
 });
 
 test('proxies HTTPS request (using request)', async (t) => {
-  bootstrap();
+  const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
-  global.GLOBAL_AGENT.HTTP_PROXY = proxyServer.url;
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response = await new Promise((resolve) => {
     makeRequest('https://127.0.0.1', (error, requestResponse, body) => {

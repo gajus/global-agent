@@ -32,3 +32,11 @@ export type IsProxyConfiguredMethodType = () => boolean;
 export type MustUrlUseProxyMethodType = (url: string) => boolean;
 export type GetUrlProxyMethodType = (url: string) => ProxyConfigurationType;
 export type ProtocolType = 'http:' | 'https:';
+
+export type ProxyAgentConfigurationInputType = {|
+  +environmentVariableNamespace?: string
+|};
+
+export type ProxyAgentConfigurationType = {|
+  +environmentVariableNamespace: string
+|};

@@ -1,25 +1,33 @@
 // @flow
 
+import Events from 'events';
 import Logger from '../Logger';
 
+type ProxyControllerType = {|
+  eventEmitter: Events | null,
+  HTTP_PROXY: string | null,
+  HTTPS_PROXY: string | null,
+  NO_PROXY: string | null
+|};
+
 const log = Logger.child({
-  namespace: 'createGlobalAgentGlobal'
+  namespace: 'createProxyController'
 });
 
 const KNOWN_PROPERTY_NAMES = [
-  'bootstrapped',
+  'eventEmitter',
   'HTTP_PROXY',
   'HTTPS_PROXY',
   'NO_PROXY'
 ];
 
-export default () => {
+export default (): ProxyControllerType => {
   // eslint-disable-next-line fp/no-proxy
   return new Proxy({
-    bootstrapped: false,
-    HTTP_PROXY: '',
-    HTTPS_PROXY: '',
-    NO_PROXY: ''
+    eventEmitter: null,
+    HTTP_PROXY: null,
+    HTTPS_PROXY: null,
+    NO_PROXY: null
   }, {
     set: (subject, name, value) => {
       if (!KNOWN_PROPERTY_NAMES.includes(name)) {
