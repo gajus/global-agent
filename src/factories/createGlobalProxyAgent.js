@@ -125,7 +125,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
 
     // $FlowFixMe
     https.globalAgent = httpsAgent;
-  } else if (semver.gte(process.version, 'v10')) {
+  } else if (semver.gte(process.version, 'v10.0.0')) {
     // $FlowFixMe
     http.get = bindHttpMethod(http.get, httpAgent);
 
