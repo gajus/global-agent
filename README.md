@@ -11,6 +11,7 @@ Global HTTP/HTTPS proxy configurable using environment variables.
 
 * [Usage](#usage)
   * [Setup proxy using `global-agent/bootstrap`](#setup-proxy-using-global-agentbootstrap)
+  * [Setup proxy using `bootstrap` routine](#setup-proxy-using-bootstrap-routine)
   * [Runtime configuration](#runtime-configuration)
   * [Exclude URLs](#exclude-urls)
   * [Enable logging](#enable-logging)
@@ -56,6 +57,21 @@ $ export GLOBAL_AGENT_HTTP_PROXY=http://127.0.0.1:8080
 $ node -r 'global-agent/bootstrap' your-script.js
 
 ```
+
+### Setup proxy using `bootstrap` routine
+
+Instead of importing a self-initialising script with side-effects as demonstrated in the [setup proxy using `global-agent/bootstrap`](#setup-proxy-using-global-agentbootstrap) documentation, you can import `bootstrap` routine and explicitly evaluate the bootstrap logic, e.g.
+
+```js
+import {
+  bootstrap
+} from 'global-agent';
+
+bootstrap();
+
+```
+
+This is useful if you need to conditionally bootstrap `global-agent`.
 
 ### Runtime configuration
 
