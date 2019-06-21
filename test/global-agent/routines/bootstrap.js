@@ -164,7 +164,6 @@ test('proxies HTTP request', async (t) => {
   t.assert(response.body === 'OK');
 });
 
-
 test('proxies HTTPS request', async (t) => {
   bootstrap({});
 
