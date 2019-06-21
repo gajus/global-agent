@@ -13,6 +13,9 @@ import {
   UnexpectedStateError
 } from '../errors';
 import {
+  createGlobalAgentGlobal
+} from '../factories';
+import {
   bindHttpMethod,
   isUrlMatchingNoProxy,
   parseProxyUrl
@@ -43,7 +46,7 @@ const createConfiguration = (configurationInput: ConfigurationInputType): Config
 export default (configurationInput: ConfigurationInputType) => {
   const configuration = createConfiguration(configurationInput);
 
-  global.GLOBAL_AGENT = global.GLOBAL_AGENT || {};
+  global.GLOBAL_AGENT = global.GLOBAL_AGENT || createGlobalAgentGlobal();
 
   if (global.GLOBAL_AGENT.bootstrapped) {
     log.warn('found global.globalAgent; second attempt to bootstrap global-agent was ignored');
