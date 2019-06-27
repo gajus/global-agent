@@ -32,14 +32,8 @@ export default (originalMethod: Function, agent: AgentType) => {
       callback = args[1];
     }
 
-    if (!options.agent) {
-      options.agent = agent;
-    }
-
-    // `request` module sets `agent` property to `http.globalAgent`/ `https.globalAgent` by default.
-    if (options.agent === http.globalAgent || options.agent === https.globalAgent) {
-      options.agent = agent;
-    }
+    // We *always* override the agent, even if explicitly set elsewhere
+    options.agent = agent;
 
     if (url) {
       // $FlowFixMe

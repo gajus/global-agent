@@ -206,7 +206,7 @@ global.GLOBAL_AGENT.eventEmitter.on('request', (request) => {
 
 ### How does it work?
 
-`global-agent` configures [`http.globalAgent`](https://nodejs.org/api/http.html#http_http_globalagent) and [`https.globalAgent`](https://nodejs.org/api/https.html#https_https_globalagent) to use a custom [Agent](https://nodejs.org/api/http.html#http_class_http_agent) for HTTP and HTTPS.
+`global-agent` configures [`http.globalAgent`](https://nodejs.org/api/http.html#http_http_globalagent) and [`https.globalAgent`](https://nodejs.org/api/https.html#https_https_globalagent) to use a custom [Agent](https://nodejs.org/api/http.html#http_class_http_agent) for HTTP and HTTPS, and ensures that all requests made with the built-in `http` and `https` modules use these agents.
 
 ### What versions of Node.js are supported?
 
