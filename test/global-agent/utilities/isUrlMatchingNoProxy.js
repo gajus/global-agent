@@ -11,8 +11,16 @@ test('returns `true` if hosts match (IP)', (t) => {
   t.assert(isUrlMatchingNoProxy('http://127.0.0.1/', '127.0.0.1'));
 });
 
-test('returns `true` if hosts match (using wildcard)', (t) => {
+test('returns `true` if hosts match (using asterisk wildcard)', (t) => {
   t.assert(isUrlMatchingNoProxy('http://bar.foo.com/', '*.foo.com'));
+});
+
+test('returns `true` if domain matches (using dot wildcard)', (t) => {
+  t.assert(isUrlMatchingNoProxy('http://foo.com/', '.foo.com'));
+});
+
+test('returns `true` if subdomain matches (using dot wildcard)', (t) => {
+  t.assert(isUrlMatchingNoProxy('http://bar.foo.com/', '.foo.com'));
 });
 
 test('returns `true` if hosts match (*) and ports match', (t) => {
@@ -41,4 +49,8 @@ test('returns `false` if hosts match and ports do not match (port not present su
 
 test('returns `true` if hosts match and ports do not match (port not present NO_PROXY)', (t) => {
   t.assert(isUrlMatchingNoProxy('http://foo.com:8000/', 'foo.com'));
+});
+
+test('returns `true` if hosts match in one of multiple rules', (t) => {
+  t.assert(isUrlMatchingNoProxy('http://foo.com/', 'bar.org,foo.com,baz.io'));
 });
