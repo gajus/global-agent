@@ -2,6 +2,7 @@
 
 import http from 'http';
 import https from 'https';
+import parseBoolean from 'boolean';
 import semver from 'semver';
 import Logger from '../Logger';
 import {
@@ -27,21 +28,43 @@ const httpRequest = http.request;
 const httpsGet = https.get;
 const httpsRequest = https.request;
 
-const defaultConfigurationInput = {
-  environmentVariableNamespace: undefined
-};
-
 const log = Logger.child({
   namespace: 'createGlobalProxyAgent'
 });
 
+const defaultConfigurationInput = {
+  environmentVariableNamespace: undefined,
+  forceGlobalAgent: undefined
+};
+
+const omitUndefined = (subject) => {
+  const keys = Object.keys(subject);
+
+  const result = {};
+
+  for (const key of keys) {
+    const value = subject[key];
+
+    if (value !== undefined) {
+      result[key] = value;
+    }
+  }
+
+  return result;
+};
+
 const createConfiguration = (configurationInput: ProxyAgentConfigurationInputType): ProxyAgentConfigurationType => {
-  // eslint-disable-next-line no-process-env
-  const DEFAULT_ENVIRONMENT_VARIABLE_NAMESPACE = typeof process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE === 'string' ? process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE : 'GLOBAL_AGENT_';
+  const defaultConfiguration = {
+    // eslint-disable-next-line no-process-env
+    environmentVariableNamespace: typeof process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE === 'string' ? process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE : 'GLOBAL_AGENT_',
+
+    // eslint-disable-next-line no-process-env
+    forceGlobalAgent: typeof process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT === 'string' ? parseBoolean(process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT) : true
+  };
 
   return {
-    ...configurationInput,
-    environmentVariableNamespace: typeof configurationInput.environmentVariableNamespace === 'string' ? configurationInput.environmentVariableNamespace : DEFAULT_ENVIRONMENT_VARIABLE_NAMESPACE
+    ...defaultConfiguration,
+    ...omitUndefined(configurationInput)
   };
 };
 
@@ -60,7 +83,8 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
   proxyController.NO_PROXY = process.env[configuration.environmentVariableNamespace + 'NO_PROXY'] || null;
 
   log.info({
-    configuration: proxyController
+    configuration,
+    state: proxyController
   }, 'global agent has been initialized');
 
   const isProxyConfigured = (getProxy) => {
@@ -128,34 +152,37 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
 
   const httpsAgent = new BoundHttpsProxyAgent();
 
-  // The reason this logic has been abandoned is because there is no guarantee
-  // that we set http(s).globalAgent variable before an instance of http(s).Agent
-  // has been already constructed by someone, e.g. Stripe SDK creates instances
-  // of http(s).Agent at the top-level.
+  // Overriding globalAgent was added in v11.7.
+  // @see https://nodejs.org/uk/blog/release/v11.7.0/
+  if (semver.gte(process.version, 'v11.7.0')) {
+    // @see https://github.com/facebook/flow/issues/7670
+    // $FlowFixMe
+    http.globalAgent = httpAgent;
+
+    // $FlowFixMe
+    https.globalAgent = httpsAgent;
+  }
+
+  // The reason this logic is used in addition to overriding http(s).globalAgent
+  // is because there is no guarantee that we set http(s).globalAgent variable
+  // before an instance of http(s).Agent has been already constructed by someone,
+  // e.g. Stripe SDK creates instances of http(s).Agent at the top-level.
   // @see https://github.com/gajus/global-agent/pull/13
   //
-  // // Overriding globalAgent was added in v11.7.
-  // // @see https://nodejs.org/uk/blog/release/v11.7.0/
-  // if (semver.gte(process.version, 'v11.7.0')) {
-  //   // @see https://github.com/facebook/flow/issues/7670
-  //   // $FlowFixMe
-  //   http.globalAgent = httpAgent;
-  //
-  //   // $FlowFixMe
-  //   https.globalAgent = httpsAgent;
-  // } else
+  // We still want to override http(s).globalAgent when possible to enable logic
+  // in `bindHttpMethod`.
   if (semver.gte(process.version, 'v10.0.0')) {
     // $FlowFixMe
-    http.get = bindHttpMethod(httpGet, httpAgent);
+    http.get = bindHttpMethod(httpGet, httpAgent, configuration.forceGlobalAgent);
 
     // $FlowFixMe
-    http.request = bindHttpMethod(httpRequest, httpAgent);
+    http.request = bindHttpMethod(httpRequest, httpAgent, configuration.forceGlobalAgent);
 
     // $FlowFixMe
-    https.get = bindHttpMethod(httpsGet, httpsAgent);
+    https.get = bindHttpMethod(httpsGet, httpsAgent, configuration.forceGlobalAgent);
 
     // $FlowFixMe
-    https.request = bindHttpMethod(httpsRequest, httpsAgent);
+    https.request = bindHttpMethod(httpsRequest, httpsAgent, configuration.forceGlobalAgent);
   } else {
     log.warn('attempt to initialize global-agent in unsupported Node.js version was ignored');
   }

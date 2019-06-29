@@ -34,9 +34,11 @@ export type GetUrlProxyMethodType = (url: string) => ProxyConfigurationType;
 export type ProtocolType = 'http:' | 'https:';
 
 export type ProxyAgentConfigurationInputType = {|
-  +environmentVariableNamespace?: string
+  +environmentVariableNamespace?: string,
+  +forceGlobalAgent?: boolean
 |};
 
 export type ProxyAgentConfigurationType = {|
-  +environmentVariableNamespace: string
+  +environmentVariableNamespace: string,
+  +forceGlobalAgent: boolean
 |};

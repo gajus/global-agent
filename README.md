@@ -16,11 +16,14 @@ Global HTTP/HTTPS proxy configurable using environment variables.
   * [Exclude URLs](#exclude-urls)
   * [Enable logging](#enable-logging)
 * [API](#api)
+  * [`createGlobalProxyAgent`](#createglobalproxyagent)
+  * [Environment variables](#environment-variables)
   * [`global.GLOBAL_AGENT`](#globalglobal_agent)
 * [Supported libraries](#supported-libraries)
 * [FAQ](#faq)
+  * [What is the reason `global-agent` overrides explicitly configured HTTP(S) agent?](#what-is-the-reason-global-agent-overrides-explicitly-configured-https-agent)
   * [What is the reason `global-agent` does not use `HTTP_PROXY`?](#what-is-the-reason-global-agent-does-not-use-http-proxy)
-  * [What is the difference from `global-tunnel`?](#what-is-the-difference-from-global-tunnel)
+  * [What is the difference from `global-tunnel` and `tunnel`?](#what-is-the-difference-from-global-tunnel-and-tunnel)
 
 ## Usage
 
@@ -157,6 +160,32 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
 
 ## API
 
+### `createGlobalProxyAgent`
+
+```js
+/**
+ * @property environmentVariableNamespace Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables. (Default: `GLOBAL_AGENT_`)
+ * @property forceGlobalAgent Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent. (Default: `true`)
+ */
+type ProxyAgentConfigurationInputType = {|
+  +environmentVariableNamespace?: string,
+  +forceGlobalAgent?: boolean
+|};
+
+(configurationInput: ProxyAgentConfigurationInputType) => ProxyAgentConfigurationType;
+
+```
+
+### Environment variables
+
+|Name|Description|Default|
+|---|---|---|
+|`GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE`|Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables.|`GLOBAL_AGENT_`|
+|`GLOBAL_AGENT_FORCE_GLOBAL_AGENT`|Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent.|`true`|
+|`${NAMESPACE}_HTTP_PROXY`|Sets the initial proxy controller HTTP_PROXY value.|``|
+|`${NAMESPACE}_HTTPS_PROXY`|Sets the initial proxy controller HTTPS_PROXY value.|``|
+|`${NAMESPACE}_NO_PROXY`|Sets the initial proxy controller NO_PROXY value.|``|
+
 ### `global.GLOBAL_AGENT`
 
 `global.GLOBAL_AGENT` is initialized by `bootstrap` routine.
@@ -180,6 +209,12 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
 * [`request`](https://www.npmjs.com/package/axios)
 
 ## FAQ
+
+### What is the reason `global-agent` overrides explicitly configured HTTP(S) agent?
+
+By default, `global-agent` overrides [`agent` property](https://nodejs.org/api/http.html#http_http_request_options_callback) of any HTTP request, even if `agent` property was explicitly set when constructing a HTTP request. This behaviour allows to intercept requests of libraries that use a custom instance of an agent per default (e.g. Stripe SDK [uses an `http(s).globalAgent` instance pre-configured with `keepAlive: true`](https://github.com/stripe/stripe-node/blob/e542902dd8fbe591fe3c3ce07a7e89d1d60e4cf7/lib/StripeResource.js#L11-L12)).
+
+This behaviour can be disabled with `GLOBAL_AGENT_FORCE_GLOBAL_AGENT=false` environment variable. When disabled, then `global-agent` will only set `agent` property when it is not already defined or if `agent` is an instance of `http(s).globalAgent`.
 
 ### What is the reason `global-agent/bootstrap` does not use `HTTP_PROXY`?
 

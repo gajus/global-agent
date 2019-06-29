@@ -1,6 +1,5 @@
 // @flow
 
-import Events from 'events';
 import Logger from '../Logger';
 
 type ProxyControllerType = {|

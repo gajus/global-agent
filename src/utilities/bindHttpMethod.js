@@ -6,7 +6,7 @@ import https from 'https';
 type AgentType = http.Agent | https.Agent;
 
 // eslint-disable-next-line flowtype/no-weak-types
-export default (originalMethod: Function, agent: AgentType) => {
+export default (originalMethod: Function, agent: AgentType, forceGlobalAgent: boolean) => {
   // eslint-disable-next-line unicorn/prevent-abbreviations
   return (...args: *) => {
     let url;
@@ -32,13 +32,16 @@ export default (originalMethod: Function, agent: AgentType) => {
       callback = args[1];
     }
 
-    if (!options.agent) {
+    if (forceGlobalAgent) {
       options.agent = agent;
-    }
+    } else {
+      if (!options.agent) {
+        options.agent = agent;
+      }
 
-    // `request` module sets `agent` property to `http.globalAgent`/ `https.globalAgent` by default.
-    if (options.agent === http.globalAgent || options.agent === https.globalAgent) {
-      options.agent = agent;
+      if (options.agent === http.globalAgent || options.agent === https.globalAgent) {
+        options.agent = agent;
+      }
     }
 
     if (url) {
