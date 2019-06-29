@@ -14,7 +14,9 @@ export default (subjectUrl: string, noProxy: string) => {
   const rules = noProxy.split(/[,\s]/);
 
   for (const rule of rules) {
-    const ruleMatch = rule.match(/^(?<hostname>.+?)(?::(?<port>\d+))?$/);
+    const ruleMatch = rule
+      .replace(/^(?<leadingDot>\.)/, '*')
+      .match(/^(?<hostname>.+?)(?::(?<port>\d+))?$/);
 
     if (!ruleMatch || !ruleMatch.groups) {
       throw new UnexpectedStateError('Invalid NO_PROXY pattern.');
