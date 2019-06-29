@@ -23,6 +23,11 @@ import type {
 } from '../types';
 import createProxyController from './createProxyController';
 
+const httpGet = http.get;
+const httpRequest = http.request;
+const httpsGet = https.get;
+const httpsRequest = https.request;
+
 const defaultConfigurationInput = {
   environmentVariableNamespace: undefined
 };
@@ -139,16 +144,16 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
     https.globalAgent = httpsAgent;
   } else if (semver.gte(process.version, 'v10.0.0')) {
     // $FlowFixMe
-    http.get = bindHttpMethod(http.get, httpAgent);
+    http.get = bindHttpMethod(httpGet, httpAgent);
 
     // $FlowFixMe
-    http.request = bindHttpMethod(http.request, httpAgent);
+    http.request = bindHttpMethod(httpRequest, httpAgent);
 
     // $FlowFixMe
-    https.get = bindHttpMethod(https.get, httpsAgent);
+    https.get = bindHttpMethod(httpsGet, httpsAgent);
 
     // $FlowFixMe
-    https.request = bindHttpMethod(https.request, httpsAgent);
+    https.request = bindHttpMethod(httpsRequest, httpsAgent);
   } else {
     log.warn('attempt to initialize global-agent in unsupported Node.js version was ignored');
   }
