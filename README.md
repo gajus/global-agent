@@ -158,26 +158,6 @@ Export `ROARR_LOG=true` environment variable to enable log printing to stdout.
 
 Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print the logs.
 
-### Events
-
-`global.GLOBAL_AGENT.eventEmitter` is an instance of a Node.js [event emitter](https://nodejs.org/api/events.html).
-
-* `request` event is emitted when a new HTTP request is proxied usign `global-agent` HTTP(S) agent.
-
-Example:
-
-```js
-global.GLOBAL_AGENT.eventEmitter.on('request', (request) => {
-  request.once('response', (response) => {
-    console.log({
-      request,
-      response
-    });
-  });
-});
-
-```
-
 ## API
 
 ### `global.GLOBAL_AGENT`

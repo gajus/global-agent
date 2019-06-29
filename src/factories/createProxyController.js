@@ -4,7 +4,6 @@ import Events from 'events';
 import Logger from '../Logger';
 
 type ProxyControllerType = {|
-  eventEmitter: Events | null,
   HTTP_PROXY: string | null,
   HTTPS_PROXY: string | null,
   NO_PROXY: string | null
@@ -15,7 +14,6 @@ const log = Logger.child({
 });
 
 const KNOWN_PROPERTY_NAMES = [
-  'eventEmitter',
   'HTTP_PROXY',
   'HTTPS_PROXY',
   'NO_PROXY'
@@ -24,7 +22,6 @@ const KNOWN_PROPERTY_NAMES = [
 export default (): ProxyControllerType => {
   // eslint-disable-next-line fp/no-proxy
   return new Proxy({
-    eventEmitter: null,
     HTTP_PROXY: null,
     HTTPS_PROXY: null,
     NO_PROXY: null

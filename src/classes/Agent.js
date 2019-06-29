@@ -1,6 +1,5 @@
 // @flow
 
-import EventEmitter from 'events';
 import serializeError from 'serialize-error';
 import Logger from '../Logger';
 import type {
@@ -30,20 +29,16 @@ class Agent {
 
   getUrlProxy: GetUrlProxyMethodType;
 
-  eventEmitter: EventEmitter;
-
   constructor (
     isProxyConfigured: IsProxyConfiguredMethodType,
     mustUrlUseProxy: MustUrlUseProxyMethodType,
     getUrlProxy: GetUrlProxyMethodType,
-    fallbackAgent: AgentType,
-    eventEmitter: EventEmitter
+    fallbackAgent: AgentType
   ) {
     this.fallbackAgent = fallbackAgent;
     this.isProxyConfigured = isProxyConfigured;
     this.mustUrlUseProxy = mustUrlUseProxy;
     this.getUrlProxy = getUrlProxy;
-    this.eventEmitter = eventEmitter;
   }
 
   addRequest (request: *, configuration: *) {
@@ -92,8 +87,6 @@ class Agent {
         request.setHeader('Proxy-Authorization', 'Basic ' + Buffer.from(proxy.authorization).toString('base64'));
       }
     }
-
-    this.eventEmitter.emit('request', request);
 
     log.trace({
       destination: requestUrl,

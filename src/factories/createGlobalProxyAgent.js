@@ -1,6 +1,5 @@
 // @flow
 
-import EventEmitter from 'events';
 import http from 'http';
 import https from 'https';
 import semver from 'semver';
@@ -95,8 +94,6 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
     };
   };
 
-  const eventEmitter = new EventEmitter();
-
   const getHttpProxy = () => {
     return proxyController.HTTP_PROXY;
   };
@@ -107,8 +104,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
         isProxyConfigured(getHttpProxy),
         mustUrlUseProxy(getHttpProxy),
         getUrlProxy(getHttpProxy),
-        http.globalAgent,
-        eventEmitter
+        http.globalAgent
       );
     }
   };
@@ -125,8 +121,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
         isProxyConfigured(getHttpsProxy),
         mustUrlUseProxy(getHttpsProxy),
         getUrlProxy(getHttpsProxy),
-        https.globalAgent,
-        eventEmitter
+        https.globalAgent
       );
     }
   };
