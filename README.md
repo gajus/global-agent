@@ -182,9 +182,9 @@ type ProxyAgentConfigurationInputType = {|
 |---|---|---|
 |`GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE`|Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables.|`GLOBAL_AGENT_`|
 |`GLOBAL_AGENT_FORCE_GLOBAL_AGENT`|Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent.|`true`|
-|`${NAMESPACE}_HTTP_PROXY`|Sets the initial proxy controller HTTP_PROXY value.|``|
-|`${NAMESPACE}_HTTPS_PROXY`|Sets the initial proxy controller HTTPS_PROXY value.|``|
-|`${NAMESPACE}_NO_PROXY`|Sets the initial proxy controller NO_PROXY value.|``|
+|`${NAMESPACE}_HTTP_PROXY`|Sets the initial proxy controller HTTP_PROXY value.|N/A|
+|`${NAMESPACE}_HTTPS_PROXY`|Sets the initial proxy controller HTTPS_PROXY value.|N/A|
+|`${NAMESPACE}_NO_PROXY`|Sets the initial proxy controller NO_PROXY value.|N/A|
 
 ### `global.GLOBAL_AGENT`
 
