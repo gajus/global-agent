@@ -128,16 +128,23 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
 
   const httpsAgent = new BoundHttpsProxyAgent();
 
-  // Overriding globalAgent was added in v11.7.
-  // @see https://nodejs.org/uk/blog/release/v11.7.0/
-  if (semver.gte(process.version, 'v11.7.0')) {
-    // @see https://github.com/facebook/flow/issues/7670
-    // $FlowFixMe
-    http.globalAgent = httpAgent;
-
-    // $FlowFixMe
-    https.globalAgent = httpsAgent;
-  } else if (semver.gte(process.version, 'v10.0.0')) {
+  // The reason this logic has been abandoned is because there is no guarantee
+  // that we set http(s).globalAgent variable before an instance of http(s).Agent
+  // has been already constructed by someone, e.g. Stripe SDK creates instances
+  // of http(s).Agent at the top-level.
+  // @see https://github.com/gajus/global-agent/pull/13
+  //
+  // // Overriding globalAgent was added in v11.7.
+  // // @see https://nodejs.org/uk/blog/release/v11.7.0/
+  // if (semver.gte(process.version, 'v11.7.0')) {
+  //   // @see https://github.com/facebook/flow/issues/7670
+  //   // $FlowFixMe
+  //   http.globalAgent = httpAgent;
+  //
+  //   // $FlowFixMe
+  //   https.globalAgent = httpsAgent;
+  // } else
+  if (semver.gte(process.version, 'v10.0.0')) {
     // $FlowFixMe
     http.get = bindHttpMethod(httpGet, httpAgent);
 

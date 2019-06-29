@@ -15,13 +15,10 @@ Global HTTP/HTTPS proxy configurable using environment variables.
   * [Runtime configuration](#runtime-configuration)
   * [Exclude URLs](#exclude-urls)
   * [Enable logging](#enable-logging)
-  * [Events](#events)
 * [API](#api)
   * [`global.GLOBAL_AGENT`](#globalglobal_agent)
 * [Supported libraries](#supported-libraries)
 * [FAQ](#faq)
-  * [How does it work?](#how-does-it-work)
-  * [What version of Node.js are supported?](#what-version-of-nodejs-are-supported)
   * [What is the reason `global-agent` does not use `HTTP_PROXY`?](#what-is-the-reason-global-agent-does-not-use-http-proxy)
   * [What is the difference from `global-tunnel`?](#what-is-the-difference-from-global-tunnel)
 
@@ -183,17 +180,6 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
 * [`request`](https://www.npmjs.com/package/axios)
 
 ## FAQ
-
-### How does it work?
-
-`global-agent` configures [`http.globalAgent`](https://nodejs.org/api/http.html#http_http_globalagent) and [`https.globalAgent`](https://nodejs.org/api/https.html#https_https_globalagent) to use a custom [Agent](https://nodejs.org/api/http.html#http_class_http_agent) for HTTP and HTTPS.
-
-### What versions of Node.js are supported?
-
-`global-agent` has been tested to work with Node v10 and above.
-
-* `global-agent` works with Node.js [v11.7.0](https://nodejs.org/uk/blog/release/v11.7.0/) and above by overriding the `http(s).globalAgent`.
-* `global-agent` works with Node.js v11.6 and below by overriding the `http(s).get` and `http(s).request` methods.
 
 ### What is the reason `global-agent/bootstrap` does not use `HTTP_PROXY`?
 
