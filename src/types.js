@@ -25,7 +25,7 @@ export type ConnectionConfigurationType = {|
   +proxy: ProxyConfigurationType
 |};
 
-export type ConnectionCallbackType = (error: Error | null, socket: Socket | TLSSocket) => void;
+export type ConnectionCallbackType = (error: Error | null, socket?: Socket | TLSSocket) => void;
 
 export type AgentType = HttpAgent | HttpsAgent;
 export type IsProxyConfiguredMethodType = () => boolean;
