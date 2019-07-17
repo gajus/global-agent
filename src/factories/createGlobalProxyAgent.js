@@ -87,12 +87,6 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
     state: proxyController
   }, 'global agent has been initialized');
 
-  const isProxyConfigured = (getProxy) => {
-    return () => {
-      return getProxy();
-    };
-  };
-
   const mustUrlUseProxy = (getProxy) => {
     return (url) => {
       if (!getProxy()) {
@@ -110,6 +104,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
   const getUrlProxy = (getProxy) => {
     return () => {
       const proxy = getProxy();
+
       if (!proxy) {
         throw new UnexpectedStateError('HTTP(S) proxy must be configured.');
       }
@@ -125,7 +120,9 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
   const BoundHttpProxyAgent = class extends HttpProxyAgent {
     constructor () {
       super(
-        isProxyConfigured(getHttpProxy),
+        () => {
+          return getHttpProxy();
+        },
         mustUrlUseProxy(getHttpProxy),
         getUrlProxy(getHttpProxy),
         http.globalAgent
@@ -142,7 +139,9 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
   const BoundHttpsProxyAgent = class extends HttpsProxyAgent {
     constructor () {
       super(
-        isProxyConfigured(getHttpsProxy),
+        () => {
+          return getHttpsProxy();
+        },
         mustUrlUseProxy(getHttpsProxy),
         getUrlProxy(getHttpsProxy),
         https.globalAgent
