@@ -23,6 +23,10 @@ class HttpsProxyAgent extends Agent {
       configuration.proxy.hostname
     );
 
+    socket.on('error', (error) => {
+      callback(error);
+    });
+
     socket.once('data', () => {
       const secureSocket = tls.connect({
         rejectUnauthorized: false,

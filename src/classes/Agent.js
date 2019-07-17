@@ -94,6 +94,12 @@ class Agent {
       requestId: currentRequestId
     }, 'proxying request');
 
+    request.on('error', (error) => {
+      log.error({
+        error: serializeError(error)
+      }, 'request error');
+    });
+
     request.once('response', (response) => {
       log.trace({
         headers: response.headers,
