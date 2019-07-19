@@ -13,7 +13,6 @@ export default (originalMethod: Function, agent: AgentType, forceGlobalAgent: bo
     let options;
     let callback;
 
-    // the url parameter can be string or URL
     if (typeof args[0] === 'string' || args[0] instanceof URL) {
       url = args[0];
 
