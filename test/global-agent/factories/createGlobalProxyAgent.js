@@ -9,12 +9,12 @@ import got from 'got';
 import axios from 'axios';
 import makeRequest from 'request';
 import AnyProxy, {
-  ProxyServer
+  ProxyServer,
 } from 'anyproxy';
 import test, {
   before,
   afterEach,
-  beforeEach
+  beforeEach,
 } from 'ava';
 import createGlobalProxyAgent from '../../../src/factories/createGlobalProxyAgent';
 
@@ -28,7 +28,7 @@ let localHttpServers = [];
 
 const getNextPort = (): Promise<number> => {
   return getPort({
-    port: getPort.makeRange(lastPort++, 3500)
+    port: getPort.makeRange(lastPort++, 3500),
   });
 };
 
@@ -80,7 +80,7 @@ const createHttpResponseResolver = (resolve) => {
       resolve({
         body,
         headers: response.headers,
-        statusCode: response.statusCode
+        statusCode: response.statusCode,
       });
     });
   };
@@ -99,13 +99,13 @@ const createProxyServer = async () => {
             response: {
               body: 'OK',
               header: {
-                'content-type': 'text/plain'
+                'content-type': 'text/plain',
               },
-              statusCode: 200
-            }
+              statusCode: 200,
+            },
           };
-        }
-      }
+        },
+      },
     });
 
     proxyServer.on('ready', () => {
@@ -113,7 +113,7 @@ const createProxyServer = async () => {
         stop: () => {
           proxyServer.close();
         },
-        url: 'http://127.0.0.1:' + port
+        url: 'http://127.0.0.1:' + port,
       });
     });
 
@@ -138,7 +138,7 @@ const createHttpServer = async () => {
         stop: () => {
           httpServer.close();
         },
-        url: 'http://127.0.0.1:' + port
+        url: 'http://127.0.0.1:' + port,
       });
     });
   });
@@ -240,7 +240,7 @@ test('proxies HTTP request (using http.get(host))', async (t) => {
 
   const response = await new Promise((resolve) => {
     http.get({
-      host: '127.0.0.1'
+      host: '127.0.0.1',
     }, createHttpResponseResolver(resolve));
   });
 

@@ -4,7 +4,7 @@ import net from 'net';
 import tls from 'tls';
 import type {
   ConnectionCallbackType,
-  ConnectionConfigurationType
+  ConnectionConfigurationType,
 } from '../types';
 import Agent from './Agent';
 
@@ -31,7 +31,7 @@ class HttpsProxyAgent extends Agent {
       const secureSocket = tls.connect({
         rejectUnauthorized: false,
         servername: configuration.host,
-        socket
+        socket,
       });
 
       callback(null, secureSocket);

@@ -7,11 +7,11 @@ import type {
   GetUrlProxyMethodType,
   IsProxyConfiguredMethodType,
   MustUrlUseProxyMethodType,
-  ProtocolType
+  ProtocolType,
 } from '../types';
 
 const log = Logger.child({
-  namespace: 'Agent'
+  namespace: 'Agent',
 });
 
 let requestId = 0;
@@ -56,7 +56,7 @@ class Agent {
 
     if (!this.isProxyConfigured()) {
       log.trace({
-        destination: requestUrl
+        destination: requestUrl,
       }, 'not proxying request; GLOBAL_AGENT.HTTP_PROXY is not configured');
 
       // $FlowFixMe It appears that Flow is missing the method description.
@@ -67,7 +67,7 @@ class Agent {
 
     if (!this.mustUrlUseProxy(requestUrl)) {
       log.trace({
-        destination: requestUrl
+        destination: requestUrl,
       }, 'not proxying request; url matches GLOBAL_AGENT.NO_PROXY');
 
       // $FlowFixMe It appears that Flow is missing the method description.
@@ -91,12 +91,12 @@ class Agent {
     log.trace({
       destination: requestUrl,
       proxy: 'http://' + proxy.hostname + ':' + proxy.port,
-      requestId: currentRequestId
+      requestId: currentRequestId,
     }, 'proxying request');
 
     request.on('error', (error) => {
       log.error({
-        error: serializeError(error)
+        error: serializeError(error),
       }, 'request error');
     });
 
@@ -104,7 +104,7 @@ class Agent {
       log.trace({
         headers: response.headers,
         requestId: currentRequestId,
-        statusCode: response.statusCode
+        statusCode: response.statusCode,
       }, 'proxying response');
     });
 
@@ -113,7 +113,7 @@ class Agent {
     const connectionConfiguration = {
       host: configuration.hostname || configuration.host,
       port: configuration.port || 80,
-      proxy
+      proxy,
     };
 
     // $FlowFixMe It appears that Flow is missing the method description.
@@ -123,7 +123,7 @@ class Agent {
       } else {
         socket.on('error', (socketError) => {
           log.error({
-            error: serializeError(socketError)
+            error: serializeError(socketError),
           }, 'socket error');
         });
 

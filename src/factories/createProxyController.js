@@ -5,17 +5,17 @@ import Logger from '../Logger';
 type ProxyControllerType = {|
   HTTP_PROXY: string | null,
   HTTPS_PROXY: string | null,
-  NO_PROXY: string | null
+  NO_PROXY: string | null,
 |};
 
 const log = Logger.child({
-  namespace: 'createProxyController'
+  namespace: 'createProxyController',
 });
 
 const KNOWN_PROPERTY_NAMES = [
   'HTTP_PROXY',
   'HTTPS_PROXY',
-  'NO_PROXY'
+  'NO_PROXY',
 ];
 
 export default (): ProxyControllerType => {
@@ -23,7 +23,7 @@ export default (): ProxyControllerType => {
   return new Proxy({
     HTTP_PROXY: null,
     HTTPS_PROXY: null,
-    NO_PROXY: null
+    NO_PROXY: null,
   }, {
     set: (subject, name, value) => {
       if (!KNOWN_PROPERTY_NAMES.includes(name)) {
@@ -35,12 +35,12 @@ export default (): ProxyControllerType => {
       log.info({
         change: {
           name,
-          value
+          value,
         },
-        newConfiguration: subject
+        newConfiguration: subject,
       }, 'configuration changed');
 
       return true;
-    }
+    },
   });
 };

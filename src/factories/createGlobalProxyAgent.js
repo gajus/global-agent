@@ -7,19 +7,19 @@ import semver from 'semver';
 import Logger from '../Logger';
 import {
   HttpProxyAgent,
-  HttpsProxyAgent
+  HttpsProxyAgent,
 } from '../classes';
 import {
-  UnexpectedStateError
+  UnexpectedStateError,
 } from '../errors';
 import {
   bindHttpMethod,
   isUrlMatchingNoProxy,
-  parseProxyUrl
+  parseProxyUrl,
 } from '../utilities';
 import type {
   ProxyAgentConfigurationInputType,
-  ProxyAgentConfigurationType
+  ProxyAgentConfigurationType,
 } from '../types';
 import createProxyController from './createProxyController';
 
@@ -29,12 +29,12 @@ const httpsGet = https.get;
 const httpsRequest = https.request;
 
 const log = Logger.child({
-  namespace: 'createGlobalProxyAgent'
+  namespace: 'createGlobalProxyAgent',
 });
 
 const defaultConfigurationInput = {
   environmentVariableNamespace: undefined,
-  forceGlobalAgent: undefined
+  forceGlobalAgent: undefined,
 };
 
 const omitUndefined = (subject) => {
@@ -59,12 +59,12 @@ const createConfiguration = (configurationInput: ProxyAgentConfigurationInputTyp
     environmentVariableNamespace: typeof process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE === 'string' ? process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE : 'GLOBAL_AGENT_',
 
     // eslint-disable-next-line no-process-env
-    forceGlobalAgent: typeof process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT === 'string' ? parseBoolean(process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT) : true
+    forceGlobalAgent: typeof process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT === 'string' ? parseBoolean(process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT) : true,
   };
 
   return {
     ...defaultConfiguration,
-    ...omitUndefined(configurationInput)
+    ...omitUndefined(configurationInput),
   };
 };
 
@@ -84,7 +84,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
 
   log.info({
     configuration,
-    state: proxyController
+    state: proxyController,
   }, 'global agent has been initialized');
 
   const mustUrlUseProxy = (getProxy) => {

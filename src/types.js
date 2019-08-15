@@ -1,28 +1,28 @@
 // @flow
 
 import {
-  Socket
+  Socket,
 } from 'net';
 import {
-  TLSSocket
+  TLSSocket,
 } from 'tls';
 import {
-  Agent as HttpAgent
+  Agent as HttpAgent,
 } from 'http';
 import {
-  Agent as HttpsAgent
+  Agent as HttpsAgent,
 } from 'https';
 
 export type ProxyConfigurationType = {|
   +authorization: string,
   +hostname: string,
-  +port: number
+  +port: number,
 |};
 
 export type ConnectionConfigurationType = {|
   +host: string,
   +port: number,
-  +proxy: ProxyConfigurationType
+  +proxy: ProxyConfigurationType,
 |};
 
 export type ConnectionCallbackType = (error: Error | null, socket?: Socket | TLSSocket) => void;
@@ -35,10 +35,10 @@ export type ProtocolType = 'http:' | 'https:';
 
 export type ProxyAgentConfigurationInputType = {|
   +environmentVariableNamespace?: string,
-  +forceGlobalAgent?: boolean
+  +forceGlobalAgent?: boolean,
 |};
 
 export type ProxyAgentConfigurationType = {|
   +environmentVariableNamespace: string,
-  +forceGlobalAgent: boolean
+  +forceGlobalAgent: boolean,
 |};

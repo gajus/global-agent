@@ -1,10 +1,10 @@
 // @flow
 
 import {
-  parse as parseUrl
+  parse as parseUrl,
 } from 'url';
 import {
-  UnexpectedStateError
+  UnexpectedStateError,
 } from '../errors';
 
 export default (url: string) => {
@@ -31,6 +31,6 @@ export default (url: string) => {
   return {
     authorization: urlTokens.auth || null,
     hostname: urlTokens.hostname,
-    port
+    port,
   };
 };

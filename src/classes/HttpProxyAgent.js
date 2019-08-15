@@ -3,7 +3,7 @@
 import net from 'net';
 import type {
   ConnectionCallbackType,
-  ConnectionConfigurationType
+  ConnectionConfigurationType,
 } from '../types';
 import Agent from './Agent';
 

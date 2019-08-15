@@ -1,11 +1,11 @@
 // @flow
 
 import {
-  parse as parseUrl
+  parse as parseUrl,
 } from 'url';
 import matcher from 'matcher';
 import {
-  UnexpectedStateError
+  UnexpectedStateError,
 } from '../errors';
 
 export default (subjectUrl: string, noProxy: string) => {

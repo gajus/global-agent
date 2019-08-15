@@ -21,13 +21,13 @@ export default (originalMethod: Function, agent: AgentType, forceGlobalAgent: bo
         callback = args[1];
       } else {
         options = {
-          ...args[1]
+          ...args[1],
         };
         callback = args[2];
       }
     } else {
       options = {
-        ...args[0]
+        ...args[0],
       };
       callback = args[1];
     }

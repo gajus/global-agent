@@ -2,14 +2,14 @@
 
 import Logger from '../Logger';
 import {
-  createGlobalProxyAgent
+  createGlobalProxyAgent,
 } from '../factories';
 import type {
-  ProxyAgentConfigurationInputType
+  ProxyAgentConfigurationInputType,
 } from '../types';
 
 const log = Logger.child({
-  namespace: 'bootstrap'
+  namespace: 'bootstrap',
 });
 
 export default (configurationInput?: ProxyAgentConfigurationInputType): boolean => {
