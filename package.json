@@ -23,7 +23,7 @@
     "core-js": "^3.2.1",
     "es6-error": "^4.1.1",
     "matcher": "^2.0.0",
-    "roarr": "^2.14.0",
+    "roarr": "^2.14.1",
     "semver": "^6.3.0",
     "serialize-error": "^4.1.0"
   },
