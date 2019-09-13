@@ -29,16 +29,20 @@ class Agent {
 
   getUrlProxy: GetUrlProxyMethodType;
 
+  socketConnectionTimeout: number;
+
   constructor (
     isProxyConfigured: IsProxyConfiguredMethodType,
     mustUrlUseProxy: MustUrlUseProxyMethodType,
     getUrlProxy: GetUrlProxyMethodType,
-    fallbackAgent: AgentType
+    fallbackAgent: AgentType,
+    socketConnectionTimeout: number
   ) {
     this.fallbackAgent = fallbackAgent;
     this.isProxyConfigured = isProxyConfigured;
     this.mustUrlUseProxy = mustUrlUseProxy;
     this.getUrlProxy = getUrlProxy;
+    this.socketConnectionTimeout = socketConnectionTimeout;
   }
 
   addRequest (request: *, configuration: *) {
@@ -118,9 +122,20 @@ class Agent {
 
     // $FlowFixMe It appears that Flow is missing the method description.
     this.createConnection(connectionConfiguration, (error, socket) => {
+      // @see https://github.com/nodejs/node/issues/5757#issuecomment-305969057
+      socket.setTimeout(this.socketConnectionTimeout, () => {
+        socket.destroy();
+      });
+
+      socket.once('connect', () => {
+        socket.setTimeout(0);
+      });
+
       if (error) {
         request.emit('error', error);
       } else {
+        log.debug('created socket');
+
         socket.on('error', (socketError) => {
           log.error({
             error: serializeError(socketError),

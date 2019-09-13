@@ -36,9 +36,11 @@ export type ProtocolType = 'http:' | 'https:';
 export type ProxyAgentConfigurationInputType = {|
   +environmentVariableNamespace?: string,
   +forceGlobalAgent?: boolean,
+  +socketConnectionTimeout?: number,
 |};
 
 export type ProxyAgentConfigurationType = {|
   +environmentVariableNamespace: string,
   +forceGlobalAgent: boolean,
+  +socketConnectionTimeout: number,
 |};

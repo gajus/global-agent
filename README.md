@@ -166,10 +166,12 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
 /**
  * @property environmentVariableNamespace Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables. (Default: `GLOBAL_AGENT_`)
  * @property forceGlobalAgent Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent. (Default: `true`)
+ * @property socketConnectionTimeout Destroys socket if connection is not established within the timeout. (Default: `5000`)
  */
 type ProxyAgentConfigurationInputType = {|
   +environmentVariableNamespace?: string,
-  +forceGlobalAgent?: boolean
+  +forceGlobalAgent?: boolean,
+  +socketConnectionTimeout?: number,
 |};
 
 (configurationInput: ProxyAgentConfigurationInputType) => ProxyAgentConfigurationType;
@@ -182,6 +184,7 @@ type ProxyAgentConfigurationInputType = {|
 |---|---|---|
 |`GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE`|Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables.|`GLOBAL_AGENT_`|
 |`GLOBAL_AGENT_FORCE_GLOBAL_AGENT`|Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent.|`true`|
+|`GLOBAL_AGENT_SOCKET_CONNECTION_TIMEOUT`|Destroys socket if connection is not established within the timeout.|`5000`|
 |`${NAMESPACE}_HTTP_PROXY`|Sets the initial proxy controller HTTP_PROXY value.|N/A|
 |`${NAMESPACE}_HTTPS_PROXY`|Sets the initial proxy controller HTTPS_PROXY value.|N/A|
 |`${NAMESPACE}_NO_PROXY`|Sets the initial proxy controller NO_PROXY value.|N/A|

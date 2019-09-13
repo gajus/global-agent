@@ -35,6 +35,7 @@ const log = Logger.child({
 const defaultConfigurationInput = {
   environmentVariableNamespace: undefined,
   forceGlobalAgent: undefined,
+  socketConnectionTimeout: 5000,
 };
 
 const omitUndefined = (subject) => {
@@ -54,12 +55,13 @@ const omitUndefined = (subject) => {
 };
 
 const createConfiguration = (configurationInput: ProxyAgentConfigurationInputType): ProxyAgentConfigurationType => {
-  const defaultConfiguration = {
-    // eslint-disable-next-line no-process-env
-    environmentVariableNamespace: typeof process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE === 'string' ? process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE : 'GLOBAL_AGENT_',
+  // eslint-disable-next-line no-process-env
+  const environment = process.env;
 
-    // eslint-disable-next-line no-process-env
-    forceGlobalAgent: typeof process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT === 'string' ? parseBoolean(process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT) : true,
+  const defaultConfiguration = {
+    environmentVariableNamespace: typeof environment.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE === 'string' ? environment.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE : 'GLOBAL_AGENT_',
+    forceGlobalAgent: typeof environment.GLOBAL_AGENT_FORCE_GLOBAL_AGENT === 'string' ? parseBoolean(environment.GLOBAL_AGENT_FORCE_GLOBAL_AGENT) : true,
+    socketConnectionTimeout: typeof environment.GLOBAL_AGENT_SOCKET_CONNECTION_TIMEOUT === 'string' ? parseInt(environment.GLOBAL_AGENT_SOCKET_CONNECTION_TIMEOUT, 10) : defaultConfigurationInput.socketConnectionTimeout,
   };
 
   return {
@@ -125,7 +127,8 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
         },
         mustUrlUseProxy(getHttpProxy),
         getUrlProxy(getHttpProxy),
-        http.globalAgent
+        http.globalAgent,
+        configuration.socketConnectionTimeout
       );
     }
   };
@@ -144,7 +147,8 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
         },
         mustUrlUseProxy(getHttpsProxy),
         getUrlProxy(getHttpsProxy),
-        https.globalAgent
+        https.globalAgent,
+        configuration.socketConnectionTimeout
       );
     }
   };
