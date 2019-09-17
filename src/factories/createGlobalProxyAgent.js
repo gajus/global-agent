@@ -35,7 +35,7 @@ const log = Logger.child({
 const defaultConfigurationInput = {
   environmentVariableNamespace: undefined,
   forceGlobalAgent: undefined,
-  socketConnectionTimeout: 5000,
+  socketConnectionTimeout: 60000,
 };
 
 const omitUndefined = (subject) => {
