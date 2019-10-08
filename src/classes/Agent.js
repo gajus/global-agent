@@ -123,13 +123,15 @@ class Agent {
     // $FlowFixMe It appears that Flow is missing the method description.
     this.createConnection(connectionConfiguration, (error, socket) => {
       // @see https://github.com/nodejs/node/issues/5757#issuecomment-305969057
-      socket.setTimeout(this.socketConnectionTimeout, () => {
-        socket.destroy();
-      });
+      if (socket) {
+        socket.setTimeout(this.socketConnectionTimeout, () => {
+          socket.destroy();
+        });
 
-      socket.once('connect', () => {
-        socket.setTimeout(0);
-      });
+        socket.once('connect', () => {
+          socket.setTimeout(0);
+        });
+      }
 
       if (error) {
         request.emit('error', error);
