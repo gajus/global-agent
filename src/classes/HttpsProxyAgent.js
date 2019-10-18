@@ -41,9 +41,11 @@ class HttpsProxyAgent extends Agent {
 
     connectMessage += 'CONNECT ' + configuration.host + ':' + configuration.port + ' HTTP/1.1\r\n';
     connectMessage += 'Host: ' + configuration.host + ':' + configuration.port + '\r\n';
+
     if (configuration.proxy.authorization) {
       connectMessage += 'Proxy-Authorization: Basic ' + Buffer.from(configuration.proxy.authorization).toString('base64') + '\r\n';
     }
+
     connectMessage += '\r\n';
 
     socket.write(connectMessage);

@@ -19,6 +19,23 @@ import test, {
 } from 'ava';
 import createGlobalProxyAgent from '../../../src/factories/createGlobalProxyAgent';
 
+const anyproxyDefaultRules = {
+  beforeDealHttpsRequest: async () => {
+    return true;
+  },
+  beforeSendRequest: () => {
+    return {
+      response: {
+        body: 'OK',
+        header: {
+          'content-type': 'text/plain',
+        },
+        statusCode: 200,
+      },
+    };
+  },
+};
+
 const defaultHttpAgent = http.globalAgent;
 const defaultHttpsAgent = https.globalAgent;
 
@@ -87,31 +104,14 @@ const createHttpResponseResolver = (resolve) => {
   };
 };
 
-const createProxyServer = async (maybeBeforeSendRequest) => {
+const createProxyServer = async (anyproxyRules) => {
   const port = await getNextPort();
-
-  let beforeSendRequest = () => {
-    return {
-      response: {
-        body: 'OK',
-        header: {
-          'content-type': 'text/plain',
-        },
-        statusCode: 200,
-      },
-    };
-  };
-
-  if (maybeBeforeSendRequest) {
-    beforeSendRequest = maybeBeforeSendRequest;
-  }
 
   const localProxyServer = await new Promise((resolve) => {
     const proxyServer = new ProxyServer({
-      forceProxyHttps: true,
       port,
       rule: {
-        beforeSendRequest,
+        ...anyproxyRules ? anyproxyRules : anyproxyDefaultRules,
       },
     });
 
@@ -173,19 +173,11 @@ test('proxies HTTP request', async (t) => {
 test('proxies HTTP request with proxy-authorization header', async (t) => {
   const globalProxyAgent = createGlobalProxyAgent();
 
-  const beforeSendRequest = sinon.stub().callsFake(() => {
-    return {
-      response: {
-        body: 'OK',
-        header: {
-          'content-type': 'text/plain',
-        },
-        statusCode: 200,
-      },
-    };
-  });
+  const beforeSendRequest = sinon.stub().callsFake(anyproxyDefaultRules.beforeSendRequest);
 
-  const proxyServer = await createProxyServer(beforeSendRequest);
+  const proxyServer = await createProxyServer({
+    beforeSendRequest,
+  });
 
   globalProxyAgent.HTTP_PROXY = 'http://foo@127.0.0.1:' + proxyServer.port;
 
@@ -210,6 +202,29 @@ test('proxies HTTPS request', async (t) => {
   });
 
   t.assert(response.body === 'OK');
+});
+
+test('proxies HTTPS request with proxy-authorization header', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const beforeDealHttpsRequest = sinon.stub().callsFake(async () => {
+    return true;
+  });
+
+  const proxyServer = await createProxyServer({
+    beforeDealHttpsRequest,
+    beforeSendRequest: anyproxyDefaultRules.beforeSendRequest,
+  });
+
+  globalProxyAgent.HTTP_PROXY = 'http://foo@127.0.0.1:' + proxyServer.port;
+
+  const response = await new Promise((resolve) => {
+    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
+  });
+
+  t.assert(response.body === 'OK');
+
+  t.is(beforeDealHttpsRequest.firstCall.args[0]._req.headers['proxy-authorization'], 'Basic Zm9v');
 });
 
 test('does not produce unhandled rejection when cannot connect to proxy', async (t) => {
