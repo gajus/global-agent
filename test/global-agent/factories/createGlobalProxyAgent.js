@@ -4,6 +4,7 @@
 
 import http from 'http';
 import https from 'https';
+import sinon from 'sinon';
 import getPort from 'get-port';
 import got from 'got';
 import axios from 'axios';
@@ -86,25 +87,31 @@ const createHttpResponseResolver = (resolve) => {
   };
 };
 
-const createProxyServer = async () => {
+const createProxyServer = async (maybeBeforeSendRequest) => {
   const port = await getNextPort();
+
+  let beforeSendRequest = (requestDetails) => {
+    return {
+      response: {
+        body: 'OK',
+        header: {
+          'content-type': 'text/plain',
+        },
+        statusCode: 200,
+      },
+    };
+  };
+
+  if (maybeBeforeSendRequest) {
+    beforeSendRequest = maybeBeforeSendRequest;
+  }
 
   const localProxyServer = await new Promise((resolve) => {
     const proxyServer = new ProxyServer({
       forceProxyHttps: true,
       port,
       rule: {
-        beforeSendRequest: () => {
-          return {
-            response: {
-              body: 'OK',
-              header: {
-                'content-type': 'text/plain',
-              },
-              statusCode: 200,
-            },
-          };
-        },
+        beforeSendRequest,
       },
     });
 
@@ -114,6 +121,7 @@ const createProxyServer = async () => {
           proxyServer.close();
         },
         url: 'http://127.0.0.1:' + port,
+        port,
       });
     });
 
@@ -160,6 +168,34 @@ test('proxies HTTP request', async (t) => {
   });
 
   t.assert(response.body === 'OK');
+});
+
+test('proxies HTTP request with proxy-authorization header', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const beforeSendRequest = sinon.stub().callsFake(() => {
+    return {
+      response: {
+        body: 'OK',
+        header: {
+          'content-type': 'text/plain',
+        },
+        statusCode: 200,
+      },
+    };
+  })
+
+  const proxyServer = await createProxyServer(beforeSendRequest);
+
+  globalProxyAgent.HTTP_PROXY = 'http://foo@127.0.0.1:' + proxyServer.port;
+
+  const response = await new Promise((resolve) => {
+    http.get('http://127.0.0.1', createHttpResponseResolver(resolve));
+  });
+
+  t.assert(response.body === 'OK');
+
+  t.is(beforeSendRequest.firstCall.args[0].requestOptions.headers['proxy-authorization'], 'Basic Zm9v')
 });
 
 test('proxies HTTPS request', async (t) => {

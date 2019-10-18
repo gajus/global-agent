@@ -90,7 +90,7 @@ class Agent {
       request.path = requestUrl;
 
       if (proxy.authorization) {
-        request.setHeader('Proxy-Authorization', 'Basic ' + Buffer.from(proxy.authorization).toString('base64'));
+        request.setHeader('proxy-authorization', 'Basic ' + Buffer.from(proxy.authorization).toString('base64'));
       }
     }
 
