@@ -1,6 +1,8 @@
 // @flow
 
-import serializeError from 'serialize-error';
+import {
+  serializeError,
+} from 'serialize-error';
 import Logger from '../Logger';
 import type {
   AgentType,
