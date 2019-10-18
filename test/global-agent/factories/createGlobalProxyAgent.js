@@ -90,7 +90,7 @@ const createHttpResponseResolver = (resolve) => {
 const createProxyServer = async (maybeBeforeSendRequest) => {
   const port = await getNextPort();
 
-  let beforeSendRequest = (requestDetails) => {
+  let beforeSendRequest = () => {
     return {
       response: {
         body: 'OK',
@@ -117,11 +117,11 @@ const createProxyServer = async (maybeBeforeSendRequest) => {
 
     proxyServer.on('ready', () => {
       resolve({
+        port,
         stop: () => {
           proxyServer.close();
         },
         url: 'http://127.0.0.1:' + port,
-        port,
       });
     });
 
@@ -183,7 +183,7 @@ test('proxies HTTP request with proxy-authorization header', async (t) => {
         statusCode: 200,
       },
     };
-  })
+  });
 
   const proxyServer = await createProxyServer(beforeSendRequest);
 
@@ -195,7 +195,7 @@ test('proxies HTTP request with proxy-authorization header', async (t) => {
 
   t.assert(response.body === 'OK');
 
-  t.is(beforeSendRequest.firstCall.args[0].requestOptions.headers['proxy-authorization'], 'Basic Zm9v')
+  t.is(beforeSendRequest.firstCall.args[0].requestOptions.headers['proxy-authorization'], 'Basic Zm9v');
 });
 
 test('proxies HTTPS request', async (t) => {
