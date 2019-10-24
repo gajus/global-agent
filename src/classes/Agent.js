@@ -124,6 +124,10 @@ class Agent {
 
     // $FlowFixMe It appears that Flow is missing the method description.
     this.createConnection(connectionConfiguration, (error, socket) => {
+      log.trace({
+        target: connectionConfiguration,
+      }, 'connecting');
+
       // @see https://github.com/nodejs/node/issues/5757#issuecomment-305969057
       if (socket) {
         socket.setTimeout(this.socketConnectionTimeout, () => {
@@ -131,6 +135,18 @@ class Agent {
         });
 
         socket.once('connect', () => {
+          log.trace({
+            target: connectionConfiguration,
+          }, 'connected');
+
+          socket.setTimeout(0);
+        });
+
+        socket.once('secureConnect', () => {
+          log.trace({
+            target: connectionConfiguration,
+          }, 'connected (secure)');
+
           socket.setTimeout(0);
         });
       }

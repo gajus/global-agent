@@ -20,10 +20,10 @@
   },
   "dependencies": {
     "boolean": "^2.0.2",
-    "core-js": "^3.3.2",
+    "core-js": "^3.3.3",
     "es6-error": "^4.1.1",
     "matcher": "^2.0.0",
-    "roarr": "^2.14.1",
+    "roarr": "^2.14.2",
     "semver": "^6.3.0",
     "serialize-error": "^5.0.0"
   },
@@ -43,7 +43,7 @@
     "coveralls": "^3.0.7",
     "eslint": "^6.5.1",
     "eslint-config-canonical": "^17.7.0",
-    "flow-bin": "^0.109.0",
+    "flow-bin": "^0.110.1",
     "flow-copy-source": "^2.0.8",
     "get-port": "^5.0.0",
     "got": "^9.6.0",
@@ -51,7 +51,7 @@
     "nyc": "^14.1.1",
     "pem": "^1.14.3",
     "request": "^2.88.0",
-    "semantic-release": "^15.13.24",
+    "semantic-release": "^15.13.27",
     "sinon": "^7.5.0"
   },
   "engines": {
