@@ -64,6 +64,7 @@ const createConfiguration = (configurationInput: ProxyAgentConfigurationInputTyp
     socketConnectionTimeout: typeof environment.GLOBAL_AGENT_SOCKET_CONNECTION_TIMEOUT === 'string' ? parseInt(environment.GLOBAL_AGENT_SOCKET_CONNECTION_TIMEOUT, 10) : defaultConfigurationInput.socketConnectionTimeout,
   };
 
+  // $FlowFixMe
   return {
     ...defaultConfiguration,
     ...omitUndefined(configurationInput),
