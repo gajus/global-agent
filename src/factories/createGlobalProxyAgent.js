@@ -129,7 +129,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
         mustUrlUseProxy(getHttpProxy),
         getUrlProxy(getHttpProxy),
         http.globalAgent,
-        configuration.socketConnectionTimeout
+        configuration.socketConnectionTimeout,
       );
     }
   };
@@ -149,7 +149,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
         mustUrlUseProxy(getHttpsProxy),
         getUrlProxy(getHttpsProxy),
         https.globalAgent,
-        configuration.socketConnectionTimeout
+        configuration.socketConnectionTimeout,
       );
     }
   };
