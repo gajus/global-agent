@@ -2,7 +2,9 @@
 
 import http from 'http';
 import https from 'https';
-import parseBoolean from 'boolean';
+import {
+  boolean as parseBoolean,
+} from 'boolean';
 import semver from 'semver';
 import Logger from '../Logger';
 import {
