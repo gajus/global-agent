@@ -4,7 +4,7 @@ import Roarr from 'roarr';
 
 const Logger = Roarr
   .child({
-    program: 'global-agent',
+    package: 'global-agent',
   });
 
 export default Logger;
