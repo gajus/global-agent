@@ -198,7 +198,7 @@ test('proxies HTTPS request', async (t) => {
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
 
   t.assert(response.body === 'OK');
@@ -219,7 +219,7 @@ test('proxies HTTPS request with proxy-authorization header', async (t) => {
   globalProxyAgent.HTTP_PROXY = 'http://foo@127.0.0.1:' + proxyServer.port;
 
   const response = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
 
   t.assert(response.body === 'OK');
@@ -245,7 +245,7 @@ test('proxies HTTPS request with dedicated proxy', async (t) => {
   globalProxyAgent.HTTPS_PROXY = proxyServer.url;
 
   const response = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
 
   t.assert(response.body === 'OK');
@@ -260,7 +260,7 @@ test('ignores dedicated HTTPS proxy for HTTP urls', async (t) => {
   globalProxyAgent.HTTPS_PROXY = 'http://example.org';
 
   const response = await new Promise((resolve) => {
-    http.get('http://127.0.0.1', createHttpResponseResolver(resolve));
+    http.get('http://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
 
   t.assert(response.body === 'OK');
