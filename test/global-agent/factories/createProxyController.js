@@ -30,8 +30,10 @@ test('sets NO_PROXY', (t) => {
 test('throws an error if unknown property is set', (t) => {
   const globalAgentGlobal = createProxyController();
 
-  t.throws(() => {
+  const error = t.throws(() => {
     // $FlowFixMe
     globalAgentGlobal.FOO = 'BAR';
-  }, 'Cannot set an unmapped property "FOO".');
+  });
+
+  t.is(error.message, 'Cannot set an unmapped property "FOO".');
 });

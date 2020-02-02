@@ -5,54 +5,54 @@
     "url": "http://gajus.com"
   },
   "ava": {
+    "babel": {
+      "compileAsTests": [
+        "test/helpers/**/*"
+      ]
+    },
     "files": [
-      "test/**/*"
-    ],
-    "helpers": [
-      "test/helpers/**/*"
+      "test/global-agent/**/*"
     ],
     "require": [
       "@babel/register"
-    ],
-    "sources": [
-      "src/**/*"
     ]
   },
   "dependencies": {
     "boolean": "^3.0.0",
-    "core-js": "^3.4.1",
+    "core-js": "^3.6.4",
     "es6-error": "^4.1.1",
-    "matcher": "^2.0.0",
-    "roarr": "^2.14.5",
-    "semver": "^6.3.0",
+    "matcher": "^2.1.0",
+    "roarr": "^2.15.2",
+    "semver": "^7.1.2",
     "serialize-error": "^5.0.0"
   },
   "description": "Global HTTP/HTTPS proxy configurable using environment variables.",
   "devDependencies": {
-    "@babel/cli": "^7.7.0",
-    "@babel/core": "^7.7.2",
-    "@babel/node": "^7.7.0",
-    "@babel/plugin-transform-flow-strip-types": "^7.6.3",
-    "@babel/preset-env": "^7.7.1",
-    "@babel/register": "^7.7.0",
-    "anyproxy": "^4.1.0",
-    "ava": "^2.4.0",
-    "axios": "^0.19.0",
-    "babel-plugin-istanbul": "^5.2.0",
+    "@ava/babel": "^1.0.0",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.4",
+    "@babel/node": "^7.8.4",
+    "@babel/plugin-transform-flow-strip-types": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "@babel/register": "^7.8.3",
+    "anyproxy": "^4.1.2",
+    "ava": "^3.1.0",
+    "axios": "^0.19.2",
+    "babel-plugin-istanbul": "^6.0.0",
     "babel-plugin-transform-export-default-name": "^2.0.4",
-    "coveralls": "^3.0.7",
-    "eslint": "^6.6.0",
-    "eslint-config-canonical": "^18.1.0",
-    "flow-bin": "^0.112.0",
-    "flow-copy-source": "^2.0.8",
-    "get-port": "^5.0.0",
-    "got": "^9.6.0",
-    "husky": "^3.1.0",
-    "nyc": "^14.1.1",
-    "pem": "^1.14.3",
+    "coveralls": "^3.0.9",
+    "eslint": "^6.8.0",
+    "eslint-config-canonical": "^18.1.1",
+    "flow-bin": "^0.117.0",
+    "flow-copy-source": "^2.0.9",
+    "get-port": "^5.1.1",
+    "got": "^10.4.0",
+    "husky": "^4.2.1",
+    "nyc": "^15.0.0",
+    "pem": "^1.14.4",
     "request": "^2.88.0",
-    "semantic-release": "^15.13.31",
-    "sinon": "^7.5.0"
+    "semantic-release": "^17.0.2",
+    "sinon": "^8.1.1"
   },
   "engines": {
     "node": ">=10.0"

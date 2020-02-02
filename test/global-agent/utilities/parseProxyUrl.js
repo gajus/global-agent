@@ -16,19 +16,25 @@ test('extracts authorization', (t) => {
 });
 
 test('throws an error if protocol is not "http:"', (t) => {
-  t.throws(() => {
+  const error = t.throws(() => {
     parseProxyUrl('https://0.0.0.0:3000');
-  }, 'Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL protocol must be "http:".');
+  });
+
+  t.is(error.message, 'Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL protocol must be "http:".');
 });
 
 test('throws an error if query is present', (t) => {
-  t.throws(() => {
+  const error = t.throws(() => {
     parseProxyUrl('http://0.0.0.0:3000/?foo=bar');
-  }, 'Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL must not have query.');
+  });
+
+  t.is(error.message, 'Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL must not have query.');
 });
 
 test('throws an error if hash is present', (t) => {
-  t.throws(() => {
+  const error = t.throws(() => {
     parseProxyUrl('http://0.0.0.0:3000/#foo');
-  }, 'Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL must not have hash.');
+  });
+
+  t.is(error.message, 'Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL must not have hash.');
 });
