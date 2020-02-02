@@ -48,8 +48,6 @@ class Agent {
   }
 
   addRequest (request: *, configuration: *) {
-    console.log('...', configuration);
-
     let requestUrl;
 
     // It is possible that addRequest was constructed for a proxied request already, e.g.
