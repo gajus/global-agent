@@ -120,6 +120,7 @@ class Agent {
       host: configuration.hostname || configuration.host,
       port: configuration.port || 80,
       proxy,
+      tls: {},
     };
 
     // add optional tls options for https requests.
