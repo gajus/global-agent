@@ -122,6 +122,34 @@ class Agent {
       proxy,
     };
 
+    // add optional tls options for https requests.
+    // @see https://nodejs.org/docs/latest-v12.x/api/https.html#https_https_request_url_options_callback :
+    // > The following additional options from tls.connect()
+    // >   - https://nodejs.org/docs/latest-v12.x/api/tls.html#tls_tls_connect_options_callback -
+    // > are also accepted:
+    // >   ca, cert, ciphers, clientCertEngine, crl, dhparam, ecdhCurve, honorCipherOrder,
+    // >   key, passphrase, pfx, rejectUnauthorized, secureOptions, secureProtocol, servername, sessionIdContext.
+    if (this.protocol === 'https:') {
+      connectionConfiguration.tls = {
+        ca: configuration.ca,
+        cert: configuration.cert,
+        ciphers: configuration.ciphers,
+        clientCertEngine: configuration.clientCertEngine,
+        crl: configuration.crl,
+        dhparam: configuration.dhparam,
+        ecdhCurve: configuration.ecdhCurve,
+        honorCipherOrder: configuration.honorCipherOrder,
+        key: configuration.key,
+        passphrase: configuration.passphrase,
+        pfx: configuration.pfx,
+        rejectUnauthorized: configuration.rejectUnauthorized,
+        secureOptions: configuration.secureOptions,
+        secureProtocol: configuration.secureProtocol,
+        servername: configuration.servername || connectionConfiguration.host,
+        sessionIdContext: configuration.sessionIdContext,
+      };
+    }
+
     // $FlowFixMe It appears that Flow is missing the method description.
     this.createConnection(connectionConfiguration, (error, socket) => {
       log.trace({
