@@ -159,7 +159,7 @@ class Agent {
       //
       // eslint-disable-next-line no-process-env
       if (typeof process.env.NODE_TLS_REJECT_UNAUTHORIZED === 'string' && boolean(process.env.NODE_TLS_REJECT_UNAUTHORIZED) === false) {
-        connectionConfiguration.tls = false;
+        connectionConfiguration.tls.rejectUnauthorized = false;
       }
     }
 
