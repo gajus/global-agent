@@ -100,7 +100,7 @@
     "create-readme": "gitdown ./.README/README.md --output-file ./README.md",
     "dev": "NODE_ENV=development babel ./src --out-dir ./dist --copy-files --source-maps --watch",
     "lint": "eslint ./src ./test && flow",
-    "test": "NODE_ENV=test nyc ava --verbose --serial"
+    "test": "NODE_TLS_REJECT_UNAUTHORIZED=false NODE_ENV=test nyc ava --verbose --serial"
   },
-  "version": "1.1.0"
+  "version": "0.0.0-development"
 }
