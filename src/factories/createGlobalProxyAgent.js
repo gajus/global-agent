@@ -63,6 +63,7 @@ const createConfiguration = (configurationInput: ProxyAgentConfigurationInputTyp
   const defaultConfiguration = {
     environmentVariableNamespace: typeof environment.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE === 'string' ? environment.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE : 'GLOBAL_AGENT_',
     forceGlobalAgent: typeof environment.GLOBAL_AGENT_FORCE_GLOBAL_AGENT === 'string' ? parseBoolean(environment.GLOBAL_AGENT_FORCE_GLOBAL_AGENT) : true,
+    rejectUnauthorized: typeof environment.NODE_TLS_REJECT_UNAUTHORIZED === 'string' ? parseBoolean(environment.NODE_TLS_REJECT_UNAUTHORIZED) : undefined,
     socketConnectionTimeout: typeof environment.GLOBAL_AGENT_SOCKET_CONNECTION_TIMEOUT === 'string' ? Number.parseInt(environment.GLOBAL_AGENT_SOCKET_CONNECTION_TIMEOUT, 10) : defaultConfigurationInput.socketConnectionTimeout,
   };
 
@@ -132,6 +133,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
         getUrlProxy(getHttpProxy),
         http.globalAgent,
         configuration.socketConnectionTimeout,
+        configuration.rejectUnauthorized,
       );
     }
   };
@@ -152,6 +154,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
         getUrlProxy(getHttpsProxy),
         https.globalAgent,
         configuration.socketConnectionTimeout,
+        configuration.rejectUnauthorized,
       );
     }
   };
