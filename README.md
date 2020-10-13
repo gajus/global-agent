@@ -79,7 +79,7 @@ This is useful if you need to conditionally bootstrap `global-agent`, e.g.
 import {
   bootstrap
 } from 'global-agent';
-import globalTunner from 'global-tunnel-ng';
+import globalTunnel from 'global-tunnel-ng';
 
 const MAJOR_NODEJS_VERSION = parseInt(process.version.slice(1).split('.')[0], 10);
 
