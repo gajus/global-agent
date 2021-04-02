@@ -51,6 +51,14 @@ test('returns `true` if hosts match and ports do not match (port not present NO_
   t.assert(isUrlMatchingNoProxy('http://foo.com:8000/', 'foo.com'));
 });
 
-test('returns `true` if hosts match in one of multiple rules', (t) => {
+test('returns `true` if hosts match in one of multiple rules separated with a comma', (t) => {
   t.assert(isUrlMatchingNoProxy('http://foo.com/', 'bar.org,foo.com,baz.io'));
+});
+
+test('returns `true` if hosts match in one of multiple rules separated with a comma and a space', (t) => {
+  t.assert(isUrlMatchingNoProxy('http://foo.com/', 'bar.org, foo.com, baz.io'));
+});
+
+test('returns `true` if hosts match in one of multiple rules separated with a space', (t) => {
+  t.assert(isUrlMatchingNoProxy('http://foo.com/', 'bar.org foo.com baz.io'));
 });

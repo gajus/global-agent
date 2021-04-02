@@ -11,7 +11,7 @@ import {
 export default (subjectUrl: string, noProxy: string) => {
   const subjectUrlTokens = parseUrl(subjectUrl);
 
-  const rules = noProxy.split(/[\s,]/);
+  const rules = noProxy.split(/[\s,]+/);
 
   for (const rule of rules) {
     const ruleMatch = rule
