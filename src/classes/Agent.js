@@ -42,14 +42,28 @@ class Agent {
     getUrlProxy: GetUrlProxyMethodType,
     fallbackAgent: AgentType,
     socketConnectionTimeout: number,
+    ca: String
   ) {
     this.fallbackAgent = fallbackAgent;
     this.isProxyConfigured = isProxyConfigured;
     this.mustUrlUseProxy = mustUrlUseProxy;
     this.getUrlProxy = getUrlProxy;
     this.socketConnectionTimeout = socketConnectionTimeout;
+    this.ca = ca;
   }
 
+  /**
+   * Method to add a list of certicates
+   * @param {*} ca list of ca certificates
+   */
+  addCACertificates (ca) {
+    if (this.ca) {
+      this.ca = this.ca.concat(ca);
+    } else {
+      this.ca = ca;
+    }
+  }
+  
   addRequest (request: *, configuration: *) {
     let requestUrl;
 
@@ -135,7 +149,7 @@ class Agent {
     // >   key, passphrase, pfx, rejectUnauthorized, secureOptions, secureProtocol, servername, sessionIdContext.
     if (this.protocol === 'https:') {
       connectionConfiguration.tls = {
-        ca: configuration.ca,
+        ca: configuration.ca || this.ca,
         cert: configuration.cert,
         ciphers: configuration.ciphers,
         clientCertEngine: configuration.clientCertEngine,
