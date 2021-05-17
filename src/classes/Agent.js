@@ -53,10 +53,13 @@ class Agent {
   }
   
   /**
-   * Method to add a list of certicates
-   * @param {*} ca list of ca certificates
+   * This method can be used to add ca certificates to the Agent
+   * @param {*} ca the certificates
    */
   addCACertificates(ca) {
+    //If there are already some ca certificates 
+    //then concat new certificate to the existing certificates
+    //otherwise directly assign new certificates to the ca property
     if (this.ca) {
       this.ca = this.ca.concat(ca);
     } else {
@@ -160,21 +163,12 @@ class Agent {
         key: configuration.key,
         passphrase: configuration.passphrase,
         pfx: configuration.pfx,
-        rejectUnauthorized: configuration.rejectUnauthorized,
+        rejectUnauthorized: configuration.rejectUnauthorized || (process.env.NODE_TLS_REJECT_UNAUTHORIZED !== '0'),
         secureOptions: configuration.secureOptions,
         secureProtocol: configuration.secureProtocol,
         servername: configuration.servername || connectionConfiguration.host,
         sessionIdContext: configuration.sessionIdContext,
       };
-
-      // This is not ideal because there is no way to override this setting using `tls` configuration if `NODE_TLS_REJECT_UNAUTHORIZED=0`.
-      // However, popular HTTP clients (such as https://github.com/sindresorhus/got) come with pre-configured value for `rejectUnauthorized`,
-      // which makes it impossible to override that value globally and respect `rejectUnauthorized` for specific requests only.
-      //
-      // eslint-disable-next-line no-process-env
-      if (typeof process.env.NODE_TLS_REJECT_UNAUTHORIZED === 'string' && boolean(process.env.NODE_TLS_REJECT_UNAUTHORIZED) === false) {
-        connectionConfiguration.tls.rejectUnauthorized = false;
-      }
     }
 
     // $FlowFixMe It appears that Flow is missing the method description.
