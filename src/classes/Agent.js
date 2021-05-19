@@ -54,7 +54,7 @@ class Agent {
     let requestUrl;
 
     // It is possible that addRequest was constructed for a proxied request already, e.g.
-    // "request" package does this when it detects that a proxy should be used
+    // "request" package does this when it detects that a proxy should be used.
     // https://github.com/request/request/blob/212570b6971a732b8dd9f3c73354bcdda158a737/request.js#L402
     // https://gist.github.com/gajus/e2074cd3b747864ffeaabbd530d30218
     if (request.path.startsWith('http://') || request.path.startsWith('https://')) {
