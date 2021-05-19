@@ -35,6 +35,8 @@ class Agent {
   getUrlProxy: GetUrlProxyMethodType;
 
   socketConnectionTimeout: number;
+  //property: ca certificates
+  ca: String;
 
   constructor (
     isProxyConfigured: IsProxyConfiguredMethodType,
@@ -53,10 +55,13 @@ class Agent {
   }
 
   /**
-   * Method to add a list of certicates
+   * This method can be used to add a list of ca certificates
    * @param {*} ca list of ca certificates
    */
-  addCACertificates (ca) {
+  addCACertificates(ca) {
+    // If there are already existing ca certificates 
+    // then concat new ca certificates with the existing one, 
+    // otherwise, directly assign new ca certificate to the ca property.
     if (this.ca) {
       this.ca = this.ca.concat(ca);
     } else {
@@ -160,21 +165,14 @@ class Agent {
         key: configuration.key,
         passphrase: configuration.passphrase,
         pfx: configuration.pfx,
-        rejectUnauthorized: configuration.rejectUnauthorized,
+        // rejectUnauthorized should be "true" by default, unless NODE_TLS_REJECT_UNAUTHORIZED environment variable is set to '0'
+        // (cf. https://nodejs.org/api/cli.html#cli_node_tls_reject_unauthorized_value )
+        rejectUnauthorized: configuration.rejectUnauthorized || (process.env.NODE_TLS_REJECT_UNAUTHORIZED !== '0'),
         secureOptions: configuration.secureOptions,
         secureProtocol: configuration.secureProtocol,
         servername: configuration.servername || connectionConfiguration.host,
         sessionIdContext: configuration.sessionIdContext,
       };
-
-      // This is not ideal because there is no way to override this setting using `tls` configuration if `NODE_TLS_REJECT_UNAUTHORIZED=0`.
-      // However, popular HTTP clients (such as https://github.com/sindresorhus/got) come with pre-configured value for `rejectUnauthorized`,
-      // which makes it impossible to override that value globally and respect `rejectUnauthorized` for specific requests only.
-      //
-      // eslint-disable-next-line no-process-env
-      if (typeof process.env.NODE_TLS_REJECT_UNAUTHORIZED === 'string' && boolean(process.env.NODE_TLS_REJECT_UNAUTHORIZED) === false) {
-        connectionConfiguration.tls.rejectUnauthorized = false;
-      }
     }
 
     // $FlowFixMe It appears that Flow is missing the method description.
