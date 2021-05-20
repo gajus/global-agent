@@ -187,7 +187,7 @@ test('Test addCACertificates and clearCACertificates methods', async (t) => {
   });
 
   t.assert(response.body === 'OK');
-  https.globalAgent.clearCaCertificates();
+  https.globalAgent.clearCACertificates();
   t.assert(https.globalAgent.ca === undefined);
 });
 
