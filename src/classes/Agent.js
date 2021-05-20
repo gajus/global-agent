@@ -172,7 +172,7 @@ class Agent {
         key: configuration.key,
         passphrase: configuration.passphrase,
         pfx: configuration.pfx,
-        rejectUnauthorized: configuration.rejectUnauthorized,
+        rejectUnauthorized: configuration.rejectUnauthorized || (boolean(process.env.NODE_TLS_REJECT_UNAUTHORIZED) !== false),
         secureOptions: configuration.secureOptions,
         secureProtocol: configuration.secureProtocol,
         servername: configuration.servername || connectionConfiguration.host,
@@ -180,15 +180,6 @@ class Agent {
       };
     }
     
-    // This is not ideal because there is no way to override this setting using `tls` configuration if `NODE_TLS_REJECT_UNAUTHORIZED=0`.
-    // However, popular HTTP clients (such as https://github.com/sindresorhus/got) come with pre-configured value for `rejectUnauthorized`,
-    // which makes it impossible to override that value globally and respect `rejectUnauthorized` for specific requests only.
-    //
-    // eslint-disable-next-line no-process-env
-    if (typeof process.env.NODE_TLS_REJECT_UNAUTHORIZED === 'string' && boolean(process.env.NODE_TLS_REJECT_UNAUTHORIZED) === false) {
-      connectionConfiguration.tls.rejectUnauthorized = false;
-    }
-
     // $FlowFixMe It appears that Flow is missing the method description.
     this.createConnection(connectionConfiguration, (error, socket) => {
       log.trace({
