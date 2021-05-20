@@ -69,6 +69,13 @@ class Agent {
     }
   }
   
+  /**
+   * Clears existing CA Certificates
+   */
+  clearCACertificates() {
+    this.ca = undefined;
+  }
+  
   addRequest (request: *, configuration: *) {
     let requestUrl;
 
