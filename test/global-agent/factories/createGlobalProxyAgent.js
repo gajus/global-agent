@@ -181,6 +181,12 @@ test('Test addCACertificates method', async (t) => {
   https.globalAgent.addCACertificates(' test-ca-certficate3');    
 
   t.assert(https.globalAgent.ca === 'test-ca-certficate1 test-ca-certficate2 test-ca-certficate3');
+  
+  const response = await new Promise((resolve) => {
+    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
+  });
+
+  t.assert(response.body === 'OK');
 });
 
 test('proxies HTTP request with proxy-authorization header', async (t) => {
