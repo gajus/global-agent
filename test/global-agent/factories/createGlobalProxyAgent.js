@@ -170,27 +170,6 @@ test('proxies HTTP request', async (t) => {
   t.assert(response.body === 'OK');
 });
 
-test('Test addCACertificates and clearCACertificates methods', async (t) => {
-  const globalProxyAgent = createGlobalProxyAgent();
-
-  const proxyServer = await createProxyServer();
-
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
-  https.globalAgent.addCACertificates('test-ca-certficate1 test-ca-certficate2');
-  https.globalAgent.addCACertificates(' test-ca-certficate3');    
-
-  t.assert(https.globalAgent.ca === 'test-ca-certficate1 test-ca-certficate2 test-ca-certficate3');
-  
-  const response = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
-  });
-
-  t.assert(response.body === 'OK');
-  https.globalAgent.clearCACertificates();
-  t.assert(https.globalAgent.ca === undefined);
-});
-
 test('proxies HTTP request with proxy-authorization header', async (t) => {
   const globalProxyAgent = createGlobalProxyAgent();
 
