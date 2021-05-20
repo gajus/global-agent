@@ -170,7 +170,7 @@ test('proxies HTTP request', async (t) => {
   t.assert(response.body === 'OK');
 });
 
-test('Test addCACertificates method', async (t) => {
+test('Test addCACertificates and clearCACertificates method', async (t) => {
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
@@ -187,6 +187,8 @@ test('Test addCACertificates method', async (t) => {
   });
 
   t.assert(response.body === 'OK');
+  https.globalAgent.clearCACertificates();
+  t.assert(https.globalAgent.ca === undefined);
 });
 
 test('proxies HTTP request with proxy-authorization header', async (t) => {
