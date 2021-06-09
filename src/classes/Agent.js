@@ -76,6 +76,16 @@ class Agent {
     this.ca = undefined;
   }
   
+  /**
+   * Evaluate value for reject unauthorized variable
+   */
+  getRejectUnauthorized() {
+    const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+    return typeof rejectUnauthorized === "undefined"
+      ? true
+      : boolean(rejectUnauthorized) !== false;
+  }
+  
   addRequest (request: *, configuration: *) {
     let requestUrl;
 
@@ -172,7 +182,7 @@ class Agent {
         key: configuration.key,
         passphrase: configuration.passphrase,
         pfx: configuration.pfx,
-        rejectUnauthorized: configuration.rejectUnauthorized || (boolean(process.env.NODE_TLS_REJECT_UNAUTHORIZED) !== false),
+        rejectUnauthorized: configuration.rejectUnauthorized || this.getRejectUnauthorized(),
         secureOptions: configuration.secureOptions,
         secureProtocol: configuration.secureProtocol,
         servername: configuration.servername || connectionConfiguration.host,
