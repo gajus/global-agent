@@ -35,7 +35,7 @@ class Agent {
   getUrlProxy: GetUrlProxyMethodType;
 
   socketConnectionTimeout: number;
-  
+
   // property: ca certificates
   ca: string;
 
@@ -45,7 +45,7 @@ class Agent {
     getUrlProxy: GetUrlProxyMethodType,
     fallbackAgent: AgentType,
     socketConnectionTimeout: number,
-    ca: string
+    ca: string,
   ) {
     this.fallbackAgent = fallbackAgent;
     this.isProxyConfigured = isProxyConfigured;
