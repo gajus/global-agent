@@ -191,6 +191,83 @@ test('Test addCACertificates and clearCACertificates methods', async (t) => {
   t.assert(https.globalAgent.ca === undefined);
 });
 
+test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
+  delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  t.assert(https.globalAgent.getRejectUnauthorized() === true);
+});
+
+test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = null', async (t) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = null;
+  console.log("type of NODE_TLS_REJECT_UNAUTHORIZED=" + typeof process.env.NODE_TLS_REJECT_UNAUTHORIZED);
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  t.assert(https.globalAgent.getRejectUnauthorized() === false);
+});
+
+test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 1', async (t) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 1;
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  t.assert(https.globalAgent.getRejectUnauthorized() === true);
+});
+
+test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 0', async (t) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  t.assert(https.globalAgent.getRejectUnauthorized() === false);
+});
+
+test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = true', async (t) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = true;
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  t.assert(https.globalAgent.getRejectUnauthorized() === true);
+});
+
+test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = false', async (t) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = false;
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  t.assert(https.globalAgent.getRejectUnauthorized() === false);
+});
+
+test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = yes', async (t) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'yes';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  t.assert(https.globalAgent.getRejectUnauthorized() === true);
+});
+
+test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = no', async (t) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'no';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  t.assert(https.globalAgent.getRejectUnauthorized() === false);
+});
+
 test('proxies HTTP request with proxy-authorization header', async (t) => {
   const globalProxyAgent = createGlobalProxyAgent();
 
