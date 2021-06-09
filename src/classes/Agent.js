@@ -35,8 +35,9 @@ class Agent {
   getUrlProxy: GetUrlProxyMethodType;
 
   socketConnectionTimeout: number;
-  //property: ca certificates
-  ca: String;
+  
+  // property: ca certificates
+  ca: string;
 
   constructor (
     isProxyConfigured: IsProxyConfiguredMethodType,
@@ -44,7 +45,7 @@ class Agent {
     getUrlProxy: GetUrlProxyMethodType,
     fallbackAgent: AgentType,
     socketConnectionTimeout: number,
-    ca: String
+    ca: string
   ) {
     this.fallbackAgent = fallbackAgent;
     this.isProxyConfigured = isProxyConfigured;
@@ -58,9 +59,9 @@ class Agent {
    * This method can be used to add a list of ca certificates
    * @param {*} ca list of ca certificates
    */
-  addCACertificates(ca) {
-    // If there are already existing ca certificates 
-    // then concat new ca certificates with the existing one, 
+  addCACertificates (ca) {
+    // If there are already existing ca certificates
+    // then concat new ca certificates with the existing one,
     // otherwise, directly assign new ca certificate to the ca property.
     if (this.ca) {
       this.ca = this.ca.concat(ca);
@@ -68,24 +69,23 @@ class Agent {
       this.ca = ca;
     }
   }
-  
+
   /**
    * Clears existing CA Certificates
    */
-  clearCACertificates() {
+  clearCACertificates () {
     this.ca = undefined;
   }
-  
+
   /**
-   * Evaluate value for reject unauthorized variable
+   * Evaluate value for tls reject unauthorized variable
    */
-  getRejectUnauthorized() {
+  getRejectUnauthorized () {
     const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-    return typeof rejectUnauthorized === "undefined"
-      ? true
-      : boolean(rejectUnauthorized) !== false;
+
+    return typeof rejectUnauthorized === 'undefined' ? true : boolean(rejectUnauthorized) !== false;
   }
-  
+
   addRequest (request: *, configuration: *) {
     let requestUrl;
 
@@ -189,7 +189,7 @@ class Agent {
         sessionIdContext: configuration.sessionIdContext,
       };
     }
-    
+
     // $FlowFixMe It appears that Flow is missing the method description.
     this.createConnection(connectionConfiguration, (error, socket) => {
       log.trace({
