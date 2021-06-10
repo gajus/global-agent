@@ -81,6 +81,7 @@ class Agent {
    * Evaluate value for tls reject unauthorized variable
    */
   getRejectUnauthorized () {
+    // eslint-disable-next-line no-process-env
     const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
 
     return typeof rejectUnauthorized === 'undefined' ? true : boolean(rejectUnauthorized) !== false;
