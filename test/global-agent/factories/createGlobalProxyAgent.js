@@ -189,7 +189,7 @@ test('Test addCACertificates and clearCACertificates methods', async (t) => {
 
   t.assert(response.body === 'OK');
   https.globalAgent.clearCACertificates();
-  t.assert(https.globalAgent.ca === undefined);
+  t.assert(https.globalAgent.ca.length === 0);
 });
 
 test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
