@@ -36,8 +36,8 @@ class Agent {
 
   socketConnectionTimeout: number;
 
-  // property: ca certificates
-  ca: string;
+  // ca property is an array of ca certificates
+  ca: object;
 
   constructor (
     isProxyConfigured: IsProxyConfiguredMethodType,
@@ -45,7 +45,7 @@ class Agent {
     getUrlProxy: GetUrlProxyMethodType,
     fallbackAgent: AgentType,
     socketConnectionTimeout: number,
-    ca: string,
+    ca: object,
   ) {
     this.fallbackAgent = fallbackAgent;
     this.isProxyConfigured = isProxyConfigured;
@@ -56,8 +56,8 @@ class Agent {
   }
 
   /**
-   * This method can be used to add a list of ca certificates
-   * @param {*} ca list of ca certificates
+   * This method can be used to add an array of ca certificates
+   * @param {*} ca an array of ca certificates
    */
   addCACertificates (ca) {
     // If there are already existing ca certificates
@@ -74,7 +74,7 @@ class Agent {
    * Clears existing CA Certificates
    */
   clearCACertificates () {
-    this.ca = undefined;
+    this.ca = [];
   }
 
   /**
