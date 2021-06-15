@@ -178,11 +178,10 @@ test('Test addCACertificates and clearCACertificates methods', async (t) => {
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   https.globalAgent.addCACertificates(['test-ca-certficate1', 'test-ca-certficate2']);
-  https.globalAgent.addCACertificates(['test-ca-certficate3']);    
+  https.globalAgent.addCACertificates(['test-ca-certficate3']);
   const result = ['test-ca-certficate1', 'test-ca-certficate2', 'test-ca-certficate3'];
   t.assert(https.globalAgent.ca.length === result.length);
   t.assert(JSON.stringify(https.globalAgent.ca) === JSON.stringify(result));
-  
   const response = await new Promise((resolve) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
@@ -193,7 +192,7 @@ test('Test addCACertificates and clearCACertificates methods', async (t) => {
 });
 
 test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
-  delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+  process.env = {};
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
@@ -203,7 +202,6 @@ test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = unde
 
 test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = null', async (t) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = null;
-  console.log("type of NODE_TLS_REJECT_UNAUTHORIZED=" + typeof process.env.NODE_TLS_REJECT_UNAUTHORIZED);
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
