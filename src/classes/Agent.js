@@ -60,6 +60,13 @@ class Agent {
    * @param {*} ca an array of ca certificates
    */
   addCACertificates (ca) {
+    // If certificate array is null or empty then return from here
+    if (!ca || ca.length === 0) {
+      log.warn('null or empty ca certificate array');
+
+      return;
+    }
+    
     // If there are already existing ca certificates
     // then concat new ca certificates with the existing one,
     // otherwise, directly assign new ca certificate to the ca property.
