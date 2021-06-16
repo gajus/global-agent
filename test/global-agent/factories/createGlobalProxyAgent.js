@@ -205,7 +205,7 @@ test('Test addCACertificates when passed ca array is null or empty', async (t) =
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
   t.assert(response.body === 'OK');
-  });
+});
 
 test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
   process.env = {};
