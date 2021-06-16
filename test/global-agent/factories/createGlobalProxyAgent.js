@@ -201,6 +201,9 @@ test('Test addCACertificates when passed ca array is null or empty', async (t) =
   https.globalAgent.addCACertificates([]);
   https.globalAgent.addCACertificates(null);
   t.assert(https.globalAgent.ca === undefined);
+  const response = await new Promise((resolve) => {
+    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
+  });
   t.assert(response.body === 'OK');
   });
 
