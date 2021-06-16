@@ -191,6 +191,19 @@ test('Test addCACertificates and clearCACertificates methods', async (t) => {
   t.assert(https.globalAgent.ca.length === 0);
 });
 
+test('Test addCACertificates when passed ca array is null or empty', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  https.globalAgent.addCACertificates([]);
+  https.globalAgent.addCACertificates(null);
+  t.assert(https.globalAgent.ca === undefined);
+  t.assert(response.body === 'OK');
+  });
+
 test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
   process.env = {};
   const globalProxyAgent = createGlobalProxyAgent();
