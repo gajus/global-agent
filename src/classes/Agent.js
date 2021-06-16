@@ -66,7 +66,7 @@ class Agent {
 
       return;
     }
-    
+
     // If there are already existing ca certificates
     // then concat new ca certificates with the existing one,
     // otherwise, directly assign new ca certificate to the ca property.
