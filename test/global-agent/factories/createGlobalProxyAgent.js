@@ -176,7 +176,7 @@ test('Test addCACertificates and clearCACertificates methods', async (t) => {
   const proxyServer = await createProxyServer();
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
+  t.assert(https.globalAgent.ca.length === 0);
   https.globalAgent.addCACertificates(['test-ca-certficate1', 'test-ca-certficate2']);
   https.globalAgent.addCACertificates(['test-ca-certficate3']);
   const result = ['test-ca-certficate1', 'test-ca-certficate2', 'test-ca-certficate3'];
@@ -191,16 +191,16 @@ test('Test addCACertificates and clearCACertificates methods', async (t) => {
   t.assert(https.globalAgent.ca.length === 0);
 });
 
-test('Test addCACertificates when passed ca array is null or empty', async (t) => {
+test('Test addCACertificates when passed ca array is null or undefined', async (t) => {
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  https.globalAgent.addCACertificates([]);
+  https.globalAgent.addCACertificates(undefined);
   https.globalAgent.addCACertificates(null);
-  t.assert(https.globalAgent.ca === undefined);
+  t.assert(https.globalAgent.ca === 0);
   const response = await new Promise((resolve) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
