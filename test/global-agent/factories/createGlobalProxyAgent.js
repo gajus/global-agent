@@ -197,10 +197,25 @@ test('Test addCACertificates when passed ca array is null or undefined', async (
   const proxyServer = await createProxyServer();
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
+  t.assert(https.globalAgent.ca.length === 0);
   https.globalAgent.addCACertificates(undefined);
   https.globalAgent.addCACertificates(null);
-  t.assert(https.globalAgent.ca === 0);
+  t.assert(https.globalAgent.ca.length === 0);
+  const response = await new Promise((resolve) => {
+    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
+  });
+  t.assert(response.body === 'OK');
+});
+
+test('Test initializing ca certificate property while creating global proxy agent', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent({ca: ['test-ca']});
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  t.assert(https.globalAgent.ca.length === 1);
+  t.assert(https.globalAgent.ca[0] === 'test-ca');
   const response = await new Promise((resolve) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
