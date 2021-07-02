@@ -52,7 +52,7 @@ class Agent {
     this.mustUrlUseProxy = mustUrlUseProxy;
     this.getUrlProxy = getUrlProxy;
     this.socketConnectionTimeout = socketConnectionTimeout;
-    this.ca = ca;
+    this.ca = ca || [];
   }
 
   /**
@@ -60,20 +60,9 @@ class Agent {
    * @param {*} ca an array of ca certificates
    */
   addCACertificates (ca) {
-    // If certificate array is null or empty then return from here
-    if (!ca || ca.length === 0) {
-      log.warn('null or empty ca certificate array');
-
-      return;
-    }
-
-    // If there are already existing ca certificates
-    // then concat new ca certificates with the existing one,
-    // otherwise, directly assign new ca certificate to the ca property.
-    if (this.ca) {
+    // concat valid ca certificates with the existing certificates,
+    if (ca) {
       this.ca = this.ca.concat(ca);
-    } else {
-      this.ca = ca;
     }
   }
 
