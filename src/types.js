@@ -57,12 +57,12 @@ export type ProxyAgentConfigurationInputType = {|
   +environmentVariableNamespace?: string,
   +forceGlobalAgent?: boolean,
   +socketConnectionTimeout?: number,
-  +ca?: object
+  +ca?: object,
 |};
 
 export type ProxyAgentConfigurationType = {|
   +environmentVariableNamespace: string,
   +forceGlobalAgent: boolean,
   +socketConnectionTimeout: number,
-  +ca: object
+  +ca: object,
 |};
