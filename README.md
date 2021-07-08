@@ -173,7 +173,7 @@ type ProxyAgentConfigurationInputType = {|
   +environmentVariableNamespace?: string,
   +forceGlobalAgent?: boolean,
   +socketConnectionTimeout?: number,
-  +ca?: object
+  +ca?: object,
 |};
 
 (configurationInput: ProxyAgentConfigurationInputType) => ProxyAgentConfigurationType;
