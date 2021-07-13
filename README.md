@@ -178,6 +178,8 @@ type ProxyAgentConfigurationInputType = {|
 
 (configurationInput: ProxyAgentConfigurationInputType) => ProxyAgentConfigurationType;
 
+### `addCACertificates`
+
 /**
  * This method can be used to add an array of ca certificates
  * @param {*} ca an array of ca certificates
@@ -188,6 +190,8 @@ addCACertificates (ca) {
     this.ca = this.ca.concat(ca);
   }
 }
+
+### `clearCACertificates`
 
 /**
  * Clears existing CA Certificates
