@@ -186,7 +186,8 @@ This method can be accessed using https to add CA certificates to the global-age
 Uses:
 ```js
 if (typeof https.globalAgent.addCACertificates === 'function') {
-  https.globalAgent.addCACertificates(certificate)
+  //certificate - an array of ca certificates to be added to the global-agent
+  https.globalAgent.addCACertificates(certificate);
 }
 ```
 
