@@ -178,9 +178,19 @@ type ProxyAgentConfigurationInputType = {|
 
 (configurationInput: ProxyAgentConfigurationInputType) => ProxyAgentConfigurationType;
 ```
+### Certificate Authority (CA)
 
 ### `addCACertificates`
+This method can be accessed using https to add CA certificates to the global-agent.
 
+Uses:
+```js
+if (typeof https.globalAgent.addCACertificates === 'function') {
+  https.globalAgent.addCACertificates(certificate)
+}
+```
+
+Method Definition:
 ```js
 /**
  * This method can be used to add an array of ca certificates
@@ -195,7 +205,15 @@ addCACertificates (ca) {
 ```
 
 ### `clearCACertificates`
+This method can be accessed using https to clear existing CA certificates from global-agent.
 
+Uses:
+```js
+if (typeof https.globalAgent.clearCACertificates === 'function') {
+  https.globalAgent.clearCACertificates();
+}
+```
+Method Definition:
 ```js
 /**
  * Clears existing CA Certificates
