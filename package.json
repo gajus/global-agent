@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "boolean": "^3.0.1",
-    "core-js": "^3.6.5",
     "es6-error": "^4.1.1",
     "matcher": "^3.0.0",
     "roarr": "^2.15.3",

@@ -14,11 +14,9 @@
     [
       "@babel/env",
       {
-        "corejs": "core-js@3",
         "targets": {
           "node": "12"
-        },
-        "useBuiltIns": "usage"
+        }
       }
     ]
   ]
