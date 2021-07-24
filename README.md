@@ -167,11 +167,15 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
  * @property environmentVariableNamespace Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables. (Default: `GLOBAL_AGENT_`)
  * @property forceGlobalAgent Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent. (Default: `true`)
  * @property socketConnectionTimeout Destroys socket if connection is not established within the timeout. (Default: `60000`)
+ * @property rejectUnauthorized `false` - all invalid SSL certificates are ignored and no error is thrown.
+ *                              `true` - an error is thrown when an invalid SSL certificate is detected.
+ *                              (Default: `undefined`)
  */
 type ProxyAgentConfigurationInputType = {|
   +environmentVariableNamespace?: string,
   +forceGlobalAgent?: boolean,
   +socketConnectionTimeout?: number,
+  +rejectUnauthorized?: boolean,
 |};
 
 (configurationInput: ProxyAgentConfigurationInputType) => ProxyAgentConfigurationType;
