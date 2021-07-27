@@ -1,6 +1,6 @@
-// @flow
-
-import Roarr from 'roarr';
+import {
+  Roarr,
+} from 'roarr';
 
 const Logger = Roarr
   .child({

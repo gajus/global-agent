@@ -1,10 +1,15 @@
 {
   "extends": [
     "canonical",
-    "canonical/flowtype"
+    "canonical/node",
+    "canonical/typescript"
   ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
   "root": true,
   "rules": {
+    "@typescript-eslint/prefer-regexp-exec": 0,
     "class-methods-use-this": 0,
     "fp/no-class": 0,
     "fp/no-events": 0,

@@ -1,20 +1,15 @@
-// @flow
-
-import {
-  parse as parseUrl,
-} from 'url';
 import {
   UnexpectedStateError,
 } from '../errors';
 
 export default (url: string) => {
-  const urlTokens = parseUrl(url);
+  const urlTokens = new URL(url);
 
-  if (urlTokens.query !== null) {
+  if (urlTokens.search !== '') {
     throw new UnexpectedStateError('Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL must not have query.');
   }
 
-  if (urlTokens.hash !== null) {
+  if (urlTokens.hash !== '') {
     throw new UnexpectedStateError('Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL must not have hash.');
   }
 
@@ -28,8 +23,16 @@ export default (url: string) => {
     port = Number.parseInt(urlTokens.port, 10);
   }
 
+  let authorization = null;
+
+  if (urlTokens.username && urlTokens.password) {
+    authorization = urlTokens.username + ':' + urlTokens.password;
+  } else if (urlTokens.username) {
+    authorization = urlTokens.username;
+  }
+
   return {
-    authorization: urlTokens.auth || null,
+    authorization,
     hostname: urlTokens.hostname,
     port,
   };
