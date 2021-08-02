@@ -248,6 +248,7 @@ serial('Test initializing ca certificate property while creating global proxy ag
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
+  // eslint-disable-next-line node/no-process-env
   process.env = {};
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();
@@ -257,6 +258,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = un
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = null', async (t) => {
+  // eslint-disable-next-line node/no-process-env
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = null;
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();
@@ -266,6 +268,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = nu
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 1', async (t) => {
+  // eslint-disable-next-line node/no-process-env
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 1;
   const globalProxyAgent = createGlobalProxyAgent();
 
@@ -277,6 +280,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 1'
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 0', async (t) => {
+  // eslint-disable-next-line node/no-process-env
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
   const globalProxyAgent = createGlobalProxyAgent();
 
@@ -288,6 +292,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 0'
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = true', async (t) => {
+  // eslint-disable-next-line node/no-process-env
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = true;
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();
@@ -297,6 +302,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = tr
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = false', async (t) => {
+  // eslint-disable-next-line node/no-process-env
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = false;
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();
@@ -306,6 +312,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = fa
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = yes', async (t) => {
+  // eslint-disable-next-line node/no-process-env
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'yes';
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();
@@ -315,6 +322,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = ye
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = no', async (t) => {
+  // eslint-disable-next-line node/no-process-env
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'no';
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();

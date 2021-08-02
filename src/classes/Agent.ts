@@ -53,9 +53,9 @@ abstract class Agent {
   public getUrlProxy: GetUrlProxyMethodType;
 
   public socketConnectionTimeout: number;
-  
+
   // ca property is an array of ca certificates
-  public ca: Array<string>;
+  public ca: string[];
 
   public constructor (
     isProxyConfigured: IsProxyConfiguredMethodType,
@@ -72,7 +72,7 @@ abstract class Agent {
     this.socketConnectionTimeout = socketConnectionTimeout;
     this.ca = ca || [];
   }
-  
+
   /**
    * This method can be used to add an array of ca certificates
    * @param {string[]} ca an array of ca certificates
@@ -95,7 +95,7 @@ abstract class Agent {
    * Evaluate value for tls reject unauthorized variable
    */
   public getRejectUnauthorized () {
-    // eslint-disable-next-line no-process-env
+    // eslint-disable-next-line node/no-process-env
     const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
 
     return typeof rejectUnauthorized === 'undefined' ? true : boolean(rejectUnauthorized) !== false;
@@ -188,7 +188,7 @@ abstract class Agent {
     // >   key, passphrase, pfx, rejectUnauthorized, secureOptions, secureProtocol, servername, sessionIdContext.
     if (configuration.secureEndpoint) {
       connectionConfiguration.tls = {
-        ca: configuration.ca || this.ca,
+        ca: configuration.ca ?? this.ca,
         cert: configuration.cert,
         ciphers: configuration.ciphers,
         clientCertEngine: configuration.clientCertEngine,
@@ -199,7 +199,7 @@ abstract class Agent {
         key: configuration.key,
         passphrase: configuration.passphrase,
         pfx: configuration.pfx,
-        rejectUnauthorized: configuration.rejectUnauthorized || this.getRejectUnauthorized(),
+        rejectUnauthorized: configuration.rejectUnauthorized ?? this.getRejectUnauthorized(),
         secureOptions: configuration.secureOptions,
         secureProtocol: configuration.secureProtocol,
         servername: configuration.servername ?? connectionConfiguration.host,
