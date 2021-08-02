@@ -177,7 +177,31 @@ type ProxyAgentConfigurationInputType = {|
 
 (configurationInput: ProxyAgentConfigurationInputType) => ProxyAgentConfigurationType;
 ```
-### Certificate Authority (CA)
+
+### Environment variables
+
+|Name|Description|Default|
+|---|---|---|
+|`GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE`|Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables.|`GLOBAL_AGENT_`|
+|`GLOBAL_AGENT_FORCE_GLOBAL_AGENT`|Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent.|`true`|
+|`GLOBAL_AGENT_SOCKET_CONNECTION_TIMEOUT`|Destroys socket if connection is not established within the timeout.|`60000`|
+|`${NAMESPACE}_HTTP_PROXY`|Sets the initial proxy controller HTTP_PROXY value.|N/A|
+|`${NAMESPACE}_HTTPS_PROXY`|Sets the initial proxy controller HTTPS_PROXY value.|N/A|
+|`${NAMESPACE}_NO_PROXY`|Sets the initial proxy controller NO_PROXY value.|N/A|
+
+### `global.GLOBAL_AGENT`
+
+`global.GLOBAL_AGENT` is initialized by `bootstrap` routine.
+
+`global.GLOBAL_AGENT` has the following properties:
+
+|Name|Description|Configurable|
+|---|---|---|
+|`HTTP_PROXY`|Yes|Sets HTTP proxy to use.|
+|`HTTPS_PROXY`|Yes|Sets a distinct proxy to use for HTTPS requests.|
+|`NO_PROXY`|Yes|Specifies a pattern of URLs that should be excluded from proxying. See [Exclude URLs](#exclude-urls).|
+
+## Certificate Authority (CA)
 
 ### `addCACertificates`
 This method can be accessed using https to add CA certificates to the global-agent.
@@ -222,29 +246,6 @@ clearCACertificates () {
   this.ca = [];
 }
 ```
-
-### Environment variables
-
-|Name|Description|Default|
-|---|---|---|
-|`GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE`|Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables.|`GLOBAL_AGENT_`|
-|`GLOBAL_AGENT_FORCE_GLOBAL_AGENT`|Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent.|`true`|
-|`GLOBAL_AGENT_SOCKET_CONNECTION_TIMEOUT`|Destroys socket if connection is not established within the timeout.|`60000`|
-|`${NAMESPACE}_HTTP_PROXY`|Sets the initial proxy controller HTTP_PROXY value.|N/A|
-|`${NAMESPACE}_HTTPS_PROXY`|Sets the initial proxy controller HTTPS_PROXY value.|N/A|
-|`${NAMESPACE}_NO_PROXY`|Sets the initial proxy controller NO_PROXY value.|N/A|
-
-### `global.GLOBAL_AGENT`
-
-`global.GLOBAL_AGENT` is initialized by `bootstrap` routine.
-
-`global.GLOBAL_AGENT` has the following properties:
-
-|Name|Description|Configurable|
-|---|---|---|
-|`HTTP_PROXY`|Yes|Sets HTTP proxy to use.|
-|`HTTPS_PROXY`|Yes|Sets a distinct proxy to use for HTTPS requests.|
-|`NO_PROXY`|Yes|Specifies a pattern of URLs that should be excluded from proxying. See [Exclude URLs](#exclude-urls).|
 
 ## Supported libraries
 
