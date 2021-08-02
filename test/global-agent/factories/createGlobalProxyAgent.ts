@@ -195,60 +195,6 @@ serial('proxies HTTP request', async (t) => {
   t.is(response.body, 'OK');
 });
 
-serial('Test addCACertificates and clearCACertificates methods', async (t) => {
-  const globalProxyAgent = createGlobalProxyAgent();
-
-  const proxyServer = await createProxyServer();
-
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-  const globalAgent: any = https.globalAgent;
-  t.is(globalAgent.ca.length, 0);
-  globalAgent.addCACertificates(['test-ca-certficate1', 'test-ca-certficate2']);
-  globalAgent.addCACertificates(['test-ca-certficate3']);
-  const result = ['test-ca-certficate1', 'test-ca-certficate2', 'test-ca-certficate3'];
-  t.is(globalAgent.ca.length, result.length);
-  t.is(JSON.stringify(globalAgent.ca), JSON.stringify(result));
-  const response: HttpResponseType = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
-  });
-
-  t.is(response.body, 'OK');
-  globalAgent.clearCACertificates();
-  t.is(globalAgent.ca.length, 0);
-});
-
-serial('Test addCACertificates when passed ca array is null or undefined', async (t) => {
-  const globalProxyAgent = createGlobalProxyAgent();
-
-  const proxyServer = await createProxyServer();
-
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-  const globalAgent: any = https.globalAgent;
-  t.is(globalAgent.ca.length, 0);
-  globalAgent.addCACertificates(undefined);
-  globalAgent.addCACertificates(null);
-  t.is(globalAgent.ca.length, 0);
-  const response: HttpResponseType = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
-  });
-  t.is(response.body, 'OK');
-});
-
-serial('Test initializing ca certificate property while creating global proxy agent', async (t) => {
-  const globalProxyAgent = createGlobalProxyAgent({ca: ['test-ca']});
-
-  const proxyServer = await createProxyServer();
-
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-  const globalAgent: any = https.globalAgent;
-  t.is(globalAgent.ca.length, 1);
-  t.is(globalAgent.ca[0], 'test-ca');
-  const response: HttpResponseType = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
-  });
-  t.is(response.body, 'OK');
-});
-
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
   // eslint-disable-next-line node/no-process-env
   process.env = {};
@@ -364,6 +310,60 @@ serial('proxies HTTPS request', async (t) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
 
+  t.is(response.body, 'OK');
+});
+
+serial('Test addCACertificates and clearCACertificates methods', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.ca.length, 0);
+  globalAgent.addCACertificates(['test-ca-certficate1', 'test-ca-certficate2']);
+  globalAgent.addCACertificates(['test-ca-certficate3']);
+  const result = ['test-ca-certficate1', 'test-ca-certficate2', 'test-ca-certficate3'];
+  t.is(globalAgent.ca.length, result.length);
+  t.is(JSON.stringify(globalAgent.ca), JSON.stringify(result));
+  const response: HttpResponseType = await new Promise((resolve) => {
+    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
+  });
+
+  t.is(response.body, 'OK');
+  globalAgent.clearCACertificates();
+  t.is(globalAgent.ca.length, 0);
+});
+
+serial('Test addCACertificates when passed ca array is null or undefined', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.ca.length, 0);
+  globalAgent.addCACertificates(undefined);
+  globalAgent.addCACertificates(null);
+  t.is(globalAgent.ca.length, 0);
+  const response: HttpResponseType = await new Promise((resolve) => {
+    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
+  });
+  t.is(response.body, 'OK');
+});
+
+serial('Test initializing ca certificate property while creating global proxy agent', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent({ca: ['test-ca']});
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.ca.length, 1);
+  t.is(globalAgent.ca[0], 'test-ca');
+  const response: HttpResponseType = await new Promise((resolve) => {
+    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
+  });
   t.is(response.body, 'OK');
 });
 
