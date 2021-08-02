@@ -208,7 +208,7 @@ serial('Test addCACertificates and clearCACertificates methods', async (t) => {
   const result = ['test-ca-certficate1', 'test-ca-certficate2', 'test-ca-certficate3'];
   t.is(globalAgent.ca.length, result.length);
   t.is(JSON.stringify(globalAgent.ca), JSON.stringify(result));
-  const response = await new Promise((resolve) => {
+  const response: HttpResponseType = await new Promise((resolve) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
 
@@ -228,7 +228,7 @@ serial('Test addCACertificates when passed ca array is null or undefined', async
   globalAgent.addCACertificates(undefined);
   globalAgent.addCACertificates(null);
   t.is(globalAgent.ca.length, 0);
-  const response = await new Promise((resolve) => {
+  const response: HttpResponseType = await new Promise((resolve) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
@@ -243,7 +243,7 @@ serial('Test initializing ca certificate property while creating global proxy ag
   const globalAgent: any = https.globalAgent;
   t.is(globalAgent.ca.length, 1);
   t.is(globalAgent.ca[0], 'test-ca');
-  const response = await new Promise((resolve) => {
+  const response: HttpResponseType = await new Promise((resolve) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
@@ -261,7 +261,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = un
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = null', async (t) => {
   // eslint-disable-next-line node/no-process-env
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = null;
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'null';
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
