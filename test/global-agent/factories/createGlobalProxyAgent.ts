@@ -201,19 +201,19 @@ serial('Test addCACertificates and clearCACertificates methods', async (t) => {
   const proxyServer = await createProxyServer();
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
-  t.is(https.globalAgent.ca.length === 0);
+  t.is(https.globalAgent.ca.length, 0);
   https.globalAgent.addCACertificates(['test-ca-certficate1', 'test-ca-certficate2']);
   https.globalAgent.addCACertificates(['test-ca-certficate3']);
   const result = ['test-ca-certficate1', 'test-ca-certficate2', 'test-ca-certficate3'];
-  t.is(https.globalAgent.ca.length === result.length);
-  t.is(JSON.stringify(https.globalAgent.ca) === JSON.stringify(result));
+  t.is(https.globalAgent.ca.length, result.length);
+  t.is(JSON.stringify(https.globalAgent.ca), JSON.stringify(result));
   const response = await new Promise((resolve) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
 
-  t.is(response.body === 'OK');
+  t.is(response.body, 'OK');
   https.globalAgent.clearCACertificates();
-  t.is(https.globalAgent.ca.length === 0);
+  t.is(https.globalAgent.ca.length, 0);
 });
 
 serial('Test addCACertificates when passed ca array is null or undefined', async (t) => {
@@ -222,14 +222,14 @@ serial('Test addCACertificates when passed ca array is null or undefined', async
   const proxyServer = await createProxyServer();
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
-  t.is(https.globalAgent.ca.length === 0);
+  t.is(https.globalAgent.ca.length, 0);
   https.globalAgent.addCACertificates(undefined);
   https.globalAgent.addCACertificates(null);
-  t.is(https.globalAgent.ca.length === 0);
+  t.is(https.globalAgent.ca.length, 0);
   const response = await new Promise((resolve) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
-  t.is(response.body === 'OK');
+  t.is(response.body, 'OK');
 });
 
 serial('Test initializing ca certificate property while creating global proxy agent', async (t) => {
@@ -239,12 +239,12 @@ serial('Test initializing ca certificate property while creating global proxy ag
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  t.is(https.globalAgent.ca.length === 1);
-  t.is(https.globalAgent.ca[0] === 'test-ca');
+  t.is(https.globalAgent.ca.length, 1);
+  t.is(https.globalAgent.ca[0], 'test-ca');
   const response = await new Promise((resolve) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
-  t.is(response.body === 'OK');
+  t.is(response.body, 'OK');
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
@@ -253,7 +253,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = un
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  t.is(https.globalAgent.getRejectUnauthorized() === true);
+  t.is(https.globalAgent.getRejectUnauthorized(), true);
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = null', async (t) => {
@@ -262,7 +262,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = nu
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  t.is(https.globalAgent.getRejectUnauthorized() === false);
+  t.is(https.globalAgent.getRejectUnauthorized(), false);
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 1', async (t) => {
@@ -273,7 +273,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 1'
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  t.is(https.globalAgent.getRejectUnauthorized() === true);
+  t.is(https.globalAgent.getRejectUnauthorized(), true);
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 0', async (t) => {
@@ -284,7 +284,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 0'
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  t.is(https.globalAgent.getRejectUnauthorized() === false);
+  t.is(https.globalAgent.getRejectUnauthorized(), false);
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = true', async (t) => {
@@ -293,7 +293,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = tr
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  t.is(https.globalAgent.getRejectUnauthorized() === true);
+  t.is(https.globalAgent.getRejectUnauthorized(), true);
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = false', async (t) => {
@@ -302,7 +302,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = fa
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  t.is(https.globalAgent.getRejectUnauthorized() === false);
+  t.is(https.globalAgent.getRejectUnauthorized(), false);
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = yes', async (t) => {
@@ -311,7 +311,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = ye
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  t.is(https.globalAgent.getRejectUnauthorized() === true);
+  t.is(https.globalAgent.getRejectUnauthorized(), true);
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = no', async (t) => {
@@ -320,7 +320,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = no
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  t.is(https.globalAgent.getRejectUnauthorized() === false);
+  t.is(https.globalAgent.getRejectUnauthorized(), false);
 });
 
 serial('proxies HTTP request with proxy-authorization header', async (t) => {

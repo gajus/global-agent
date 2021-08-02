@@ -166,7 +166,7 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
  * @property environmentVariableNamespace Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables. (Default: `GLOBAL_AGENT_`)
  * @property forceGlobalAgent Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent. (Default: `true`)
  * @property socketConnectionTimeout Destroys socket if connection is not established within the timeout. (Default: `60000`)
- * @property ca An array of CA certificates that is trusted for secure connections to the registry.
+ * @property ca An array of CA certificates that is trusted for secure connections to the registry. (Default: '[]')
  */
 type ProxyAgentConfigurationInputType = {|
   +environmentVariableNamespace?: string,

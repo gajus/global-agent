@@ -62,5 +62,5 @@ export type ProxyAgentConfigurationType = {
   environmentVariableNamespace: string,
   forceGlobalAgent: boolean,
   socketConnectionTimeout: number,
-  ca?: string[],
+  ca: string[],
 };
