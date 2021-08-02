@@ -18,7 +18,7 @@ export type ProxyConfigurationType = {
 };
 
 export type TlsConfigurationType = {
-  ca?: object,
+  ca?: Array<string>,
   cert?: string,
   ciphers?: string,
   clientCertEngine?: string,
@@ -55,12 +55,12 @@ export type ProxyAgentConfigurationInputType = {
   environmentVariableNamespace?: string,
   forceGlobalAgent?: boolean,
   socketConnectionTimeout?: number,
-  ca?: object,
+  ca?: Array<string>,
 };
 
 export type ProxyAgentConfigurationType = {
   environmentVariableNamespace: string,
   forceGlobalAgent: boolean,
   socketConnectionTimeout: number,
-  ca: object,
+  ca?: Array<string>,
 };

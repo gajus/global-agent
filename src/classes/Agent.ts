@@ -55,7 +55,7 @@ abstract class Agent {
   public socketConnectionTimeout: number;
   
   // ca property is an array of ca certificates
-  public ca: object;
+  public ca: Array<string>;
 
   public constructor (
     isProxyConfigured: IsProxyConfiguredMethodType,
@@ -63,21 +63,21 @@ abstract class Agent {
     getUrlProxy: GetUrlProxyMethodType,
     fallbackAgent: AgentType,
     socketConnectionTimeout: number,
-	  ca: object,
+    ca: Array<string>,
   ) {
     this.fallbackAgent = fallbackAgent;
     this.isProxyConfigured = isProxyConfigured;
     this.mustUrlUseProxy = mustUrlUseProxy;
     this.getUrlProxy = getUrlProxy;
     this.socketConnectionTimeout = socketConnectionTimeout;
-	  this.ca = ca || [];
+    this.ca = ca || [];
   }
   
   /**
    * This method can be used to add an array of ca certificates
    * @param {*} ca an array of ca certificates
    */
-  public addCACertificates (ca: object) {
+  public addCACertificates (ca: Array<string>) {
     // concat valid ca certificates with the existing certificates,
     if (ca) {
       this.ca = this.ca.concat(ca);

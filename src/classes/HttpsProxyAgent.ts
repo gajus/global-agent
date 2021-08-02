@@ -17,6 +17,7 @@ class HttpsProxyAgent extends Agent {
     getUrlProxy: GetUrlProxyMethodType,
     fallbackAgent: AgentType,
     socketConnectionTimeout: number,
+    ca: Array<string>,
   ) {
     super(
       isProxyConfigured,
@@ -24,6 +25,7 @@ class HttpsProxyAgent extends Agent {
       getUrlProxy,
       fallbackAgent,
       socketConnectionTimeout,
+      ca,
     );
 
     this.protocol = 'https:';
