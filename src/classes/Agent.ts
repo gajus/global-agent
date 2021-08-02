@@ -53,6 +53,9 @@ abstract class Agent {
   public getUrlProxy: GetUrlProxyMethodType;
 
   public socketConnectionTimeout: number;
+  
+  // ca property is an array of ca certificates
+  public ca: object;
 
   public constructor (
     isProxyConfigured: IsProxyConfiguredMethodType,
@@ -60,12 +63,42 @@ abstract class Agent {
     getUrlProxy: GetUrlProxyMethodType,
     fallbackAgent: AgentType,
     socketConnectionTimeout: number,
+	ca: object,
   ) {
     this.fallbackAgent = fallbackAgent;
     this.isProxyConfigured = isProxyConfigured;
     this.mustUrlUseProxy = mustUrlUseProxy;
     this.getUrlProxy = getUrlProxy;
     this.socketConnectionTimeout = socketConnectionTimeout;
+	this.ca = ca || [];
+  }
+  
+  /**
+   * This method can be used to add an array of ca certificates
+   * @param {*} ca an array of ca certificates
+   */
+  public addCACertificates (ca: object) {
+    // concat valid ca certificates with the existing certificates,
+    if (ca) {
+      this.ca = this.ca.concat(ca);
+    }
+  }
+
+  /**
+   * Clears existing CA Certificates
+   */
+  public clearCACertificates () {
+    this.ca = [];
+  }
+
+  /**
+   * Evaluate value for tls reject unauthorized variable
+   */
+  public getRejectUnauthorized () {
+    // eslint-disable-next-line no-process-env
+    const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+
+    return typeof rejectUnauthorized === 'undefined' ? true : boolean(rejectUnauthorized) !== false;
   }
 
   public abstract createConnection (configuration: ConnectionConfigurationType, callback: ConnectionCallbackType): void;
@@ -155,7 +188,7 @@ abstract class Agent {
     // >   key, passphrase, pfx, rejectUnauthorized, secureOptions, secureProtocol, servername, sessionIdContext.
     if (configuration.secureEndpoint) {
       connectionConfiguration.tls = {
-        ca: configuration.ca,
+        ca: configuration.ca || this.ca,
         cert: configuration.cert,
         ciphers: configuration.ciphers,
         clientCertEngine: configuration.clientCertEngine,
@@ -166,26 +199,12 @@ abstract class Agent {
         key: configuration.key,
         passphrase: configuration.passphrase,
         pfx: configuration.pfx,
-        rejectUnauthorized: configuration.rejectUnauthorized,
+        rejectUnauthorized: configuration.rejectUnauthorized || this.getRejectUnauthorized(),
         secureOptions: configuration.secureOptions,
         secureProtocol: configuration.secureProtocol,
         servername: configuration.servername ?? connectionConfiguration.host,
         sessionIdContext: configuration.sessionIdContext,
       };
-
-      // This is not ideal because there is no way to override this setting using `tls` configuration if `NODE_TLS_REJECT_UNAUTHORIZED=0`.
-      // However, popular HTTP clients (such as https://github.com/sindresorhus/got) come with pre-configured value for `rejectUnauthorized`,
-      // which makes it impossible to override that value globally and respect `rejectUnauthorized` for specific requests only.
-      if (
-        // eslint-disable-next-line node/no-process-env
-        typeof process.env.NODE_TLS_REJECT_UNAUTHORIZED === 'string' &&
-
-        // eslint-disable-next-line node/no-process-env
-        boolean(process.env.NODE_TLS_REJECT_UNAUTHORIZED) === false
-      ) {
-        // @ts-expect-error seems like we are using wrong guard for this change that does not align with secureEndpoint
-        connectionConfiguration.tls.rejectUnauthorized = false;
-      }
     }
 
     this.createConnection(connectionConfiguration, (error, socket) => {
