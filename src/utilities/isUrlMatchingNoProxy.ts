@@ -1,15 +1,10 @@
-// @flow
-
-import {
-  parse as parseUrl,
-} from 'url';
 import matcher from 'matcher';
 import {
   UnexpectedStateError,
 } from '../errors';
 
 export default (subjectUrl: string, noProxy: string) => {
-  const subjectUrlTokens = parseUrl(subjectUrl);
+  const subjectUrlTokens = new URL(subjectUrl);
 
   const rules = noProxy.split(/[\s,]+/);
 

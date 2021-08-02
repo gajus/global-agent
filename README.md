@@ -1,6 +1,5 @@
 # global-agent
 
-[![GitSpo Mentions](https://gitspo.com/badges/mentions/gajus/global-agent?style=flat-square)](https://gitspo.com/mentions/gajus/global-agent)
 [![Travis build status](http://img.shields.io/travis/gajus/global-agent/master.svg?style=flat-square)](https://travis-ci.org/gajus/global-agent)
 [![Coveralls](https://img.shields.io/coveralls/gajus/global-agent.svg?style=flat-square)](https://coveralls.io/github/gajus/global-agent)
 [![NPM version](http://img.shields.io/npm/v/global-agent.svg?style=flat-square)](https://www.npmjs.org/package/global-agent)

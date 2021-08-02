@@ -1,23 +1,36 @@
-// @flow
-
 import net from 'net';
 import tls from 'tls';
 import type {
+  AgentType,
   ConnectionCallbackType,
   ConnectionConfigurationType,
+  GetUrlProxyMethodType,
+  IsProxyConfiguredMethodType,
+  MustUrlUseProxyMethodType,
 } from '../types';
 import Agent from './Agent';
 
 class HttpsProxyAgent extends Agent {
-  // eslint-disable-next-line unicorn/prevent-abbreviations
-  constructor (...args: *) {
-    super(...args);
+  public constructor (
+    isProxyConfigured: IsProxyConfiguredMethodType,
+    mustUrlUseProxy: MustUrlUseProxyMethodType,
+    getUrlProxy: GetUrlProxyMethodType,
+    fallbackAgent: AgentType,
+    socketConnectionTimeout: number,
+  ) {
+    super(
+      isProxyConfigured,
+      mustUrlUseProxy,
+      getUrlProxy,
+      fallbackAgent,
+      socketConnectionTimeout,
+    );
 
     this.protocol = 'https:';
     this.defaultPort = 443;
   }
 
-  createConnection (configuration: ConnectionConfigurationType, callback: ConnectionCallbackType) {
+  public createConnection (configuration: ConnectionConfigurationType, callback: ConnectionCallbackType) {
     const socket = net.connect(
       configuration.proxy.port,
       configuration.proxy.hostname,

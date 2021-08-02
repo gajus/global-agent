@@ -1,14 +1,14 @@
-// @flow
-
 import http from 'http';
 import https from 'https';
 
 type AgentType = http.Agent | https.Agent;
 
-// eslint-disable-next-line flowtype/no-weak-types
-export default (originalMethod: Function, agent: AgentType, forceGlobalAgent: boolean) => {
-  // eslint-disable-next-line unicorn/prevent-abbreviations
-  return (...args: *) => {
+export default (
+  originalMethod: Function,
+  agent: AgentType,
+  forceGlobalAgent: boolean,
+) => {
+  return (...args: any[]) => {
     let url;
     let options;
     let callback;
@@ -45,7 +45,6 @@ export default (originalMethod: Function, agent: AgentType, forceGlobalAgent: bo
     }
 
     if (url) {
-      // $FlowFixMe
       return originalMethod(url, options, callback);
     } else {
       return originalMethod(options, callback);

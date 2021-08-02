@@ -1,14 +1,16 @@
-// @flow
-
-import {
-  serializeError,
-} from 'serialize-error';
+import type * as http from 'http';
+import type * as https from 'https';
 import {
   boolean,
 } from 'boolean';
+import {
+  serializeError,
+} from 'serialize-error';
 import Logger from '../Logger';
 import type {
   AgentType,
+  ConnectionCallbackType,
+  ConnectionConfigurationType,
   GetUrlProxyMethodType,
   IsProxyConfiguredMethodType,
   MustUrlUseProxyMethodType,
@@ -21,25 +23,42 @@ const log = Logger.child({
 
 let requestId = 0;
 
-class Agent {
-  defaultPort: number;
+type AgentRequestOptions = {
+  host?: string,
+  path?: string,
+  port: number,
+};
 
-  protocol: ProtocolType;
+type HttpRequestOptions = AgentRequestOptions & Omit<http.RequestOptions, keyof AgentRequestOptions> & {
+  secureEndpoint: false,
+};
 
-  fallbackAgent: AgentType;
+type HttpsRequestOptions = AgentRequestOptions & Omit<https.RequestOptions, keyof AgentRequestOptions> & {
+  secureEndpoint: true,
+};
 
-  isProxyConfigured: IsProxyConfiguredMethodType;
+type RequestOptions = HttpRequestOptions | HttpsRequestOptions;
 
-  mustUrlUseProxy: MustUrlUseProxyMethodType;
+abstract class Agent {
+  public defaultPort: number;
 
-  getUrlProxy: GetUrlProxyMethodType;
+  public protocol: ProtocolType;
 
-  socketConnectionTimeout: number;
+  public fallbackAgent: AgentType;
+
+  public isProxyConfigured: IsProxyConfiguredMethodType;
+
+  public mustUrlUseProxy: MustUrlUseProxyMethodType;
 
   // ca property is an array of ca certificates
-  ca: object;
+  public ca: object;
 
   constructor (
+  public getUrlProxy: GetUrlProxyMethodType;
+
+  public socketConnectionTimeout: number;
+
+  public constructor (
     isProxyConfigured: IsProxyConfiguredMethodType,
     mustUrlUseProxy: MustUrlUseProxyMethodType,
     getUrlProxy: GetUrlProxyMethodType,
@@ -59,7 +78,7 @@ class Agent {
    * This method can be used to add an array of ca certificates
    * @param {*} ca an array of ca certificates
    */
-  addCACertificates (ca) {
+ public addCACertificates (ca) {
     // concat valid ca certificates with the existing certificates,
     if (ca) {
       this.ca = this.ca.concat(ca);
@@ -69,7 +88,7 @@ class Agent {
   /**
    * Clears existing CA Certificates
    */
-  clearCACertificates () {
+ public clearCACertificates () {
     this.ca = [];
   }
 
@@ -83,17 +102,19 @@ class Agent {
     return typeof rejectUnauthorized === 'undefined' ? true : boolean(rejectUnauthorized) !== false;
   }
 
-  addRequest (request: *, configuration: *) {
+  public abstract createConnection (configuration: ConnectionConfigurationType, callback: ConnectionCallbackType): void;
+
+  public addRequest (request: http.ClientRequest, configuration: RequestOptions) {
     let requestUrl;
 
     // It is possible that addRequest was constructed for a proxied request already, e.g.
     // "request" package does this when it detects that a proxy should be used
     // https://github.com/request/request/blob/212570b6971a732b8dd9f3c73354bcdda158a737/request.js#L402
     // https://gist.github.com/gajus/e2074cd3b747864ffeaabbd530d30218
-    if (request.path.startsWith('http://') || request.path.startsWith('https://')) {
+    if (request.path.startsWith('http://') ?? request.path.startsWith('https://')) {
       requestUrl = request.path;
     } else {
-      requestUrl = this.protocol + '//' + (configuration.hostname || configuration.host) + (configuration.port === 80 || configuration.port === 443 ? '' : ':' + configuration.port) + request.path;
+      requestUrl = this.protocol + '//' + (configuration.hostname ?? configuration.host) + (configuration.port === 80 ?? configuration.port === 443 ? '' : ':' + configuration.port) + request.path;
     }
 
     if (!this.isProxyConfigured()) {
@@ -101,7 +122,7 @@ class Agent {
         destination: requestUrl,
       }, 'not proxying request; GLOBAL_AGENT.HTTP_PROXY is not configured');
 
-      // $FlowFixMe It appears that Flow is missing the method description.
+      // @ts-expect-error seems like we are using wrong type for fallbackAgent.
       this.fallbackAgent.addRequest(request, configuration);
 
       return;
@@ -112,7 +133,7 @@ class Agent {
         destination: requestUrl,
       }, 'not proxying request; url matches GLOBAL_AGENT.NO_PROXY');
 
-      // $FlowFixMe It appears that Flow is missing the method description.
+      // @ts-expect-error seems like we are using wrong type for fallbackAgent.
       this.fallbackAgent.addRequest(request, configuration);
 
       return;
@@ -136,13 +157,13 @@ class Agent {
       requestId: currentRequestId,
     }, 'proxying request');
 
-    request.on('error', (error) => {
+    request.on('error', (error: Error) => {
       log.error({
         error: serializeError(error),
       }, 'request error');
     });
 
-    request.once('response', (response) => {
+    request.once('response', (response: http.IncomingMessage) => {
       log.trace({
         headers: response.headers,
         requestId: currentRequestId,
@@ -153,8 +174,8 @@ class Agent {
     request.shouldKeepAlive = false;
 
     const connectionConfiguration = {
-      host: configuration.hostname || configuration.host,
-      port: configuration.port || 80,
+      host: configuration.hostname ?? configuration.host ?? '',
+      port: configuration.port ?? 80,
       proxy,
       tls: {},
     };
@@ -166,7 +187,7 @@ class Agent {
     // > are also accepted:
     // >   ca, cert, ciphers, clientCertEngine, crl, dhparam, ecdhCurve, honorCipherOrder,
     // >   key, passphrase, pfx, rejectUnauthorized, secureOptions, secureProtocol, servername, sessionIdContext.
-    if (this.protocol === 'https:') {
+    if (configuration.secureEndpoint) {
       connectionConfiguration.tls = {
         ca: configuration.ca || this.ca,
         cert: configuration.cert,
@@ -182,12 +203,11 @@ class Agent {
         rejectUnauthorized: configuration.rejectUnauthorized || this.getRejectUnauthorized(),
         secureOptions: configuration.secureOptions,
         secureProtocol: configuration.secureProtocol,
-        servername: configuration.servername || connectionConfiguration.host,
+        servername: configuration.servername ?? connectionConfiguration.host,
         sessionIdContext: configuration.sessionIdContext,
       };
     }
 
-    // $FlowFixMe It appears that Flow is missing the method description.
     this.createConnection(connectionConfiguration, (error, socket) => {
       log.trace({
         target: connectionConfiguration,
@@ -218,10 +238,10 @@ class Agent {
 
       if (error) {
         request.emit('error', error);
-      } else {
+      } else if (socket) {
         log.debug('created socket');
 
-        socket.on('error', (socketError) => {
+        socket.on('error', (socketError: Error) => {
           log.error({
             error: serializeError(socketError),
           }, 'socket error');

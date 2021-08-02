@@ -1,5 +1,3 @@
-// @flow
-
 import test from 'ava';
 import createProxyController from '../../../src/factories/createProxyController';
 
@@ -31,7 +29,7 @@ test('throws an error if unknown property is set', (t) => {
   const globalAgentGlobal = createProxyController();
 
   const error = t.throws(() => {
-    // $FlowFixMe
+    // @ts-expect-error expected unknown property.
     globalAgentGlobal.FOO = 'BAR';
   });
 

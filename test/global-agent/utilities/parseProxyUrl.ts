@@ -1,18 +1,16 @@
-// @flow
-
 import test from 'ava';
 import parseProxyUrl from '../../../src/utilities/parseProxyUrl';
 
 test('extracts hostname', (t) => {
-  t.assert(parseProxyUrl('http://0.0.0.0').hostname === '0.0.0.0');
+  t.is(parseProxyUrl('http://0.0.0.0').hostname, '0.0.0.0');
 });
 
 test('extracts port', (t) => {
-  t.assert(parseProxyUrl('http://0.0.0.0:3000').port === 3000);
+  t.is(parseProxyUrl('http://0.0.0.0:3000').port, 3_000);
 });
 
 test('extracts authorization', (t) => {
-  t.assert(parseProxyUrl('http://foo:bar@0.0.0.0').authorization === 'foo:bar');
+  t.is(parseProxyUrl('http://foo:bar@0.0.0.0').authorization, 'foo:bar');
 });
 
 test('throws an error if protocol is not "http:"', (t) => {
