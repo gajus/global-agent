@@ -200,6 +200,52 @@ type ProxyAgentConfigurationInputType = {|
 |`HTTPS_PROXY`|Yes|Sets a distinct proxy to use for HTTPS requests.|
 |`NO_PROXY`|Yes|Specifies a pattern of URLs that should be excluded from proxying. See [Exclude URLs](#exclude-urls).|
 
+## Certificate Authority (CA)
+
+### `addCACertificates`
+This method can be accessed using https to add CA certificates to the global-agent.
+
+Uses:
+```js
+if (typeof https.globalAgent.addCACertificates === 'function') {
+  //certificate - an array of ca certificates to be added to the global-agent
+  https.globalAgent.addCACertificates(certificate);
+}
+```
+
+Method Definition:
+```js
+/**
+ * This method can be used to add an array of ca certificates
+ * @param {*} ca an array of ca certificates
+ */
+addCACertificates (ca) {
+  // Concat valid ca certificates with the existing ca certificates.
+  if (ca) {
+    this.ca = this.ca.concat(ca);
+  }
+}
+```
+
+### `clearCACertificates`
+This method can be accessed using https to clear existing CA certificates from global-agent.
+
+Uses:
+```js
+if (typeof https.globalAgent.clearCACertificates === 'function') {
+  https.globalAgent.clearCACertificates();
+}
+```
+Method Definition:
+```js
+/**
+ * Clears existing CA Certificates
+ */
+clearCACertificates () {
+  this.ca = [];
+}
+```
+
 ## Supported libraries
 
 `global-agent` works with all libraries that internally use [`http.request`](https://nodejs.org/api/http.html#http_http_request_options_callback).
