@@ -219,7 +219,7 @@ Method Definition:
  * This method can be used to add an array of ca certificates
  * @param {*} ca an array of ca certificates
  */
-addCACertificates (ca) {
+addCACertificates (ca: object) {
   // Concat valid ca certificates with the existing ca certificates.
   if (ca) {
     this.ca = this.ca.concat(ca);
