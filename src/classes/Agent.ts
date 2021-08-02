@@ -63,7 +63,7 @@ abstract class Agent {
     getUrlProxy: GetUrlProxyMethodType,
     fallbackAgent: AgentType,
     socketConnectionTimeout: number,
-    ca: Array<string>,
+    ca: string[],
   ) {
     this.fallbackAgent = fallbackAgent;
     this.isProxyConfigured = isProxyConfigured;
@@ -75,9 +75,9 @@ abstract class Agent {
   
   /**
    * This method can be used to add an array of ca certificates
-   * @param {*} ca an array of ca certificates
+   * @param {string[]} ca an array of ca certificates
    */
-  public addCACertificates (ca: Array<string>) {
+  public addCACertificates (ca: string[]) {
     // concat valid ca certificates with the existing certificates,
     if (ca) {
       this.ca = this.ca.concat(ca);

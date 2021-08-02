@@ -17,7 +17,7 @@ class HttpsProxyAgent extends Agent {
     getUrlProxy: GetUrlProxyMethodType,
     fallbackAgent: AgentType,
     socketConnectionTimeout: number,
-    ca: Array<string>,
+    ca: string[],
   ) {
     super(
       isProxyConfigured,
