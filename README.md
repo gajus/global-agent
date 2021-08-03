@@ -59,7 +59,7 @@ $ node -r 'global-agent/bootstrap' your-script.js
 
 ```
 
-### Setup proxy using `bootstrap` routine
+### Setup proxy using `bootstrap()` routine
 
 Instead of importing a self-initialising script with side-effects as demonstrated in the [setup proxy using `global-agent/bootstrap`](#setup-proxy-using-global-agentbootstrap) documentation, you can import `bootstrap` routine and explicitly evaluate the bootstrap logic, e.g.
 
