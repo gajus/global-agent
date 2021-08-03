@@ -70,7 +70,7 @@ abstract class Agent {
     this.mustUrlUseProxy = mustUrlUseProxy;
     this.getUrlProxy = getUrlProxy;
     this.socketConnectionTimeout = socketConnectionTimeout;
-    this.ca = ca || [];
+    this.ca = ca;
   }
 
   /**

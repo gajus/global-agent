@@ -53,6 +53,7 @@ const anyproxyDefaultRules = {
 const defaultHttpAgent = http.globalAgent;
 const defaultHttpsAgent = https.globalAgent;
 
+// Backup original value of NODE_TLS_REJECT_UNAUTHORIZED
 // eslint-disable-next-line node/no-process-env
 const defaultNodeTlsRejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
 
@@ -98,7 +99,8 @@ afterEach(() => {
   }
 
   localHttpServers = [];
-  //reset NODE_TLS_REJECT_UNAUTHORIZED to original value
+
+  // Reset NODE_TLS_REJECT_UNAUTHORIZED to original value
   // eslint-disable-next-line node/no-process-env
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = defaultNodeTlsRejectUnauthorized;
 });
@@ -227,7 +229,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = un
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
-  const globalAgent : any = https.globalAgent;
+  const globalAgent: any = https.globalAgent;
   t.is(globalAgent.getRejectUnauthorized(), true);
 });
 
@@ -238,7 +240,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = nu
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  const globalAgent : any = https.globalAgent;
+  const globalAgent: any = https.globalAgent;
   t.is(globalAgent.getRejectUnauthorized(), false);
 });
 
@@ -251,7 +253,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 1'
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  const globalAgent : any = https.globalAgent;
+  const globalAgent: any = https.globalAgent;
   t.is(globalAgent.getRejectUnauthorized(), true);
 });
 
@@ -264,7 +266,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 0'
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  const globalAgent : any = https.globalAgent;
+  const globalAgent: any = https.globalAgent;
   t.is(globalAgent.getRejectUnauthorized(), false);
 });
 
@@ -275,7 +277,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = tr
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  const globalAgent : any = https.globalAgent;
+  const globalAgent: any = https.globalAgent;
   t.is(globalAgent.getRejectUnauthorized(), true);
 });
 
@@ -286,7 +288,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = fa
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  const globalAgent : any = https.globalAgent;
+  const globalAgent: any = https.globalAgent;
   t.is(globalAgent.getRejectUnauthorized(), false);
 });
 
@@ -297,7 +299,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = ye
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  const globalAgent : any = https.globalAgent;
+  const globalAgent: any = https.globalAgent;
   t.is(globalAgent.getRejectUnauthorized(), true);
 });
 
@@ -308,7 +310,7 @@ serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = no
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  const globalAgent : any = https.globalAgent;
+  const globalAgent: any = https.globalAgent;
   t.is(globalAgent.getRejectUnauthorized(), false);
 });
 
