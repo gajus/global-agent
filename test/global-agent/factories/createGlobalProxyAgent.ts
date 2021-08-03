@@ -225,12 +225,22 @@ serial('proxies HTTP request with proxy-authorization header', async (t) => {
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
   // eslint-disable-next-line node/no-process-env
-  process.env = {};
+  let {GLOBAL_AGENT_FORCE_GLOBAL_AGENT, ...restEnvs} = process.env;
+  // eslint-disable-next-line node/no-process-env
+  process.env = restEnvs;
+  // eslint-disable-next-line node/no-process-env
+  process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT = 'true';
   const globalProxyAgent = createGlobalProxyAgent();
   const proxyServer = await createProxyServer();
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
   const globalAgent: any = https.globalAgent;
   t.is(globalAgent.getRejectUnauthorized(), true);
+
+  const response: HttpResponseType = await new Promise((resolve) => {
+    http.get('http://127.0.0.1', createHttpResponseResolver(resolve));
+  });
+
+  t.is(response.body, 'OK');
 });
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = null', async (t) => {
