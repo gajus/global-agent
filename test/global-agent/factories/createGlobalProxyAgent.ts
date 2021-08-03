@@ -53,6 +53,9 @@ const anyproxyDefaultRules = {
 const defaultHttpAgent = http.globalAgent;
 const defaultHttpsAgent = https.globalAgent;
 
+// eslint-disable-next-line node/no-process-env
+const defaultNodeTlsRejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+
 let lastPort = 3_000;
 
 let localProxyServers: ProxyServerType[] = [];
@@ -95,6 +98,9 @@ afterEach(() => {
   }
 
   localHttpServers = [];
+  //reset NODE_TLS_REJECT_UNAUTHORIZED to original value
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = defaultNodeTlsRejectUnauthorized;
 });
 
 type HttpResponseType = {
@@ -195,90 +201,6 @@ serial('proxies HTTP request', async (t) => {
   t.is(response.body, 'OK');
 });
 
-serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
-  // eslint-disable-next-line node/no-process-env
-  process.env = {};
-  const globalProxyAgent = createGlobalProxyAgent();
-  const proxyServer = await createProxyServer();
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
-  t.is((https.globalAgent as any).getRejectUnauthorized(), true);
-});
-
-serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = null', async (t) => {
-  // eslint-disable-next-line node/no-process-env
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'null';
-  const globalProxyAgent = createGlobalProxyAgent();
-  const proxyServer = await createProxyServer();
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
-  t.is((https.globalAgent as any).getRejectUnauthorized(), false);
-});
-
-serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 1', async (t) => {
-  // eslint-disable-next-line node/no-process-env
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
-  const globalProxyAgent = createGlobalProxyAgent();
-
-  const proxyServer = await createProxyServer();
-
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
-  t.is((https.globalAgent as any).getRejectUnauthorized(), true);
-});
-
-serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 0', async (t) => {
-  // eslint-disable-next-line node/no-process-env
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-  const globalProxyAgent = createGlobalProxyAgent();
-
-  const proxyServer = await createProxyServer();
-
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
-  t.is((https.globalAgent as any).getRejectUnauthorized(), false);
-});
-
-serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = true', async (t) => {
-  // eslint-disable-next-line node/no-process-env
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'true';
-  const globalProxyAgent = createGlobalProxyAgent();
-  const proxyServer = await createProxyServer();
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
-  t.is((https.globalAgent as any).getRejectUnauthorized(), true);
-});
-
-serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = false', async (t) => {
-  // eslint-disable-next-line node/no-process-env
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'false';
-  const globalProxyAgent = createGlobalProxyAgent();
-  const proxyServer = await createProxyServer();
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
-  t.is((https.globalAgent as any).getRejectUnauthorized(), false);
-});
-
-serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = yes', async (t) => {
-  // eslint-disable-next-line node/no-process-env
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'yes';
-  const globalProxyAgent = createGlobalProxyAgent();
-  const proxyServer = await createProxyServer();
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
-  t.is((https.globalAgent as any).getRejectUnauthorized(), true);
-});
-
-serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = no', async (t) => {
-  // eslint-disable-next-line node/no-process-env
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'no';
-  const globalProxyAgent = createGlobalProxyAgent();
-  const proxyServer = await createProxyServer();
-  globalProxyAgent.HTTP_PROXY = proxyServer.url;
-
-  t.is((https.globalAgent as any).getRejectUnauthorized(), false);
-});
-
 serial('proxies HTTP request with proxy-authorization header', async (t) => {
   const globalProxyAgent = createGlobalProxyAgent();
 
@@ -299,18 +221,95 @@ serial('proxies HTTP request with proxy-authorization header', async (t) => {
   t.is(beforeSendRequest.firstCall.args[0].requestOptions.headers['proxy-authorization'], 'Basic Zm9v');
 });
 
-serial('proxies HTTPS request', async (t) => {
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env = {};
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent : any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), true);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = null', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'null';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent : any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), false);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 1', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
-  const response: HttpResponseType = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
-  });
+  const globalAgent : any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), true);
+});
 
-  t.is(response.body, 'OK');
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 0', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent : any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), false);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = true', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'true';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent : any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), true);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = false', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'false';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent : any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), false);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = yes', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'yes';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent : any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), true);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = no', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'no';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent : any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), false);
 });
 
 serial('Test addCACertificates and clearCACertificates methods', async (t) => {
@@ -326,11 +325,6 @@ serial('Test addCACertificates and clearCACertificates methods', async (t) => {
   const result = ['test-ca-certficate1', 'test-ca-certficate2', 'test-ca-certficate3'];
   t.is(globalAgent.ca.length, result.length);
   t.is(JSON.stringify(globalAgent.ca), JSON.stringify(result));
-  const response: HttpResponseType = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
-  });
-
-  t.is(response.body, 'OK');
   globalAgent.clearCACertificates();
   t.is(globalAgent.ca.length, 0);
 });
@@ -347,7 +341,7 @@ serial('Test addCACertificates when passed ca array is null or undefined', async
   globalAgent.addCACertificates(null);
   t.is(globalAgent.ca.length, 0);
   const response: HttpResponseType = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', {secureEndpoint: true}, createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
 });
@@ -362,8 +356,22 @@ serial('Test initializing ca certificate property while creating global proxy ag
   t.is(globalAgent.ca.length, 1);
   t.is(globalAgent.ca[0], 'test-ca');
   const response: HttpResponseType = await new Promise((resolve) => {
+    https.get('https://127.0.0.1', {secureEndpoint: true}, createHttpResponseResolver(resolve));
+  });
+  t.is(response.body, 'OK');
+});
+
+serial('proxies HTTPS request', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const response: HttpResponseType = await new Promise((resolve) => {
     https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
   });
+
   t.is(response.body, 'OK');
 });
 
