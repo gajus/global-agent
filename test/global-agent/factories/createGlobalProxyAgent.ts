@@ -344,7 +344,7 @@ serial('Test addCACertificates when passed ca array is null or undefined', async
   t.is(globalAgent.ca.length, 0);
   const response: HttpResponseType = await new Promise((resolve) => {
     // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
-    https.get('https://127.0.0.1', {secureEndpoint: true}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, rejectUnauthorized: false}, createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
 });
@@ -360,7 +360,7 @@ serial('Test initializing ca certificate property while creating global proxy ag
   t.is(globalAgent.ca[0], 'test-ca');
   const response: HttpResponseType = await new Promise((resolve) => {
     // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
-    https.get('https://127.0.0.1', {secureEndpoint: true}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', {secureEndpoint: true, rejectUnauthorized: false}, createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
 });
