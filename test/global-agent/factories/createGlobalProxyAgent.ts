@@ -344,7 +344,7 @@ serial('Test addCACertificates when passed ca array is null or undefined', async
   t.is(globalAgent.ca.length, 0);
   const response: HttpResponseType = await new Promise((resolve) => {
     // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
-    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, rejectUnauthorized: false}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true}, createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
 });
