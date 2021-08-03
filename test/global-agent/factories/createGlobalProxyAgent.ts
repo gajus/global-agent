@@ -181,7 +181,7 @@ const createHttpServer = async (): Promise<HttpServerType> => {
   return localHttpServer;
 };
 
-serial('proxies HTTP request', async (t) => {
+serial('proxies HTTP request:', async (t) => {
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
