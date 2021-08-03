@@ -225,9 +225,9 @@ serial('proxies HTTP request with proxy-authorization header', async (t) => {
 
 serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
   // eslint-disable-next-line node/no-process-env
-  let {NODE_TLS_REJECT_UNAUTHORIZED, ...restEnvs} = process.env;
+  const {NODE_TLS_REJECT_UNAUTHORIZED, ...restEnvironments} = process.env; // eslint-disable-line @typescript-eslint/no-unused-vars
   // eslint-disable-next-line node/no-process-env
-  process.env = restEnvs;
+  process.env = restEnvironments;
   // eslint-disable-next-line node/no-process-env
   process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT = 'true';
   const globalProxyAgent = createGlobalProxyAgent();
