@@ -166,7 +166,7 @@ abstract class Agent {
         key: configuration.key,
         passphrase: configuration.passphrase,
         pfx: configuration.pfx,
-        rejectUnauthorized: configuration.rejectUnauthorized,
+        rejectUnauthorized: configuration.rejectUnauthorized ?? true,
         secureOptions: configuration.secureOptions,
         secureProtocol: configuration.secureProtocol,
         servername: configuration.servername ?? connectionConfiguration.host,
