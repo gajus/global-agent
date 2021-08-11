@@ -1,9 +1,6 @@
 import type * as http from 'http';
 import type * as https from 'https';
 import {
-  boolean,
-} from 'boolean';
-import {
   serializeError,
 } from 'serialize-error';
 import Logger from '../Logger';
@@ -178,10 +175,7 @@ abstract class Agent {
       // which makes it impossible to override that value globally and respect `rejectUnauthorized` for specific requests only.
       if (
         // eslint-disable-next-line node/no-process-env
-        typeof process.env.NODE_TLS_REJECT_UNAUTHORIZED === 'string' &&
-
-        // eslint-disable-next-line node/no-process-env
-        boolean(process.env.NODE_TLS_REJECT_UNAUTHORIZED) === false
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0'
       ) {
         // @ts-expect-error seems like we are using wrong guard for this change that does not align with secureEndpoint
         connectionConfiguration.tls.rejectUnauthorized = false;
