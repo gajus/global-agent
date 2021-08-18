@@ -94,7 +94,7 @@ abstract class Agent {
   public getRejectUnauthorized () {
     // eslint-disable-next-line node/no-process-env
     const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;    
-    boolean returnValue = false;
+    let returnValue = false;
 
     if (typeof rejectUnauthorized === boolean) {
       returnValue = rejectUnauthorized;
