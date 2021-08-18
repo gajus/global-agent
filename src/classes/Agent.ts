@@ -96,11 +96,11 @@ abstract class Agent {
     const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;    
     let returnValue = false;
 
-    if (typeof rejectUnauthorized === boolean) {
+    if (typeof rejectUnauthorized === "boolean") {
       returnValue = rejectUnauthorized;
-    } else if (typeof rejectUnauthorized === number) {
+    } else if (typeof rejectUnauthorized === "number") {
       returnValue = rejectUnauthorized === 1;
-    } else if (typeof rejectUnauthorized === string) {
+    } else if (typeof rejectUnauthorized === "string") {
       returnValue = ['true', 't', 'yes', 'y', 'on', '1'].includes(rejectUnauthorized.trim().toLowerCase());
     }
 
