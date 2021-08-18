@@ -95,7 +95,7 @@ abstract class Agent {
     // eslint-disable-next-line node/no-process-env
     const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
 
-    return typeof rejectUnauthorized === 'undefined' ? true : boolean(rejectUnauthorized) !== false;
+    return (typeof rejectUnauthorized === 'undefined' || rejectUnauthorized === '1' || rejectUnauthorized === 'yes' || rejectUnauthorized === 'true');
   }
 
   public abstract createConnection (configuration: ConnectionConfigurationType, callback: ConnectionCallbackType): void;
