@@ -97,10 +97,10 @@ abstract class Agent {
     boolean returnValue = false;
 
     if (typeof rejectUnauthorized === boolean) {
-      returnValue = rejectUnauthorized
+      returnValue = rejectUnauthorized;
     } else if (typeof rejectUnauthorized === number) {
-      returnValue = rejectUnauthorized === 1
-    } else if (typeof rejectUnauthorized === string){
+      returnValue = rejectUnauthorized === 1;
+    } else if (typeof rejectUnauthorized === string) {
       returnValue = ['true', 't', 'yes', 'y', 'on', '1'].includes(rejectUnauthorized.trim().toLowerCase());
     }
 
