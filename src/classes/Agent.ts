@@ -1,9 +1,6 @@
 import type * as http from 'http';
 import type * as https from 'https';
 import {
-  boolean,
-} from 'boolean';
-import {
   serializeError,
 } from 'serialize-error';
 import Logger from '../Logger';
