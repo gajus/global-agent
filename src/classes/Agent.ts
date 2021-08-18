@@ -93,9 +93,18 @@ abstract class Agent {
    */
   public getRejectUnauthorized () {
     // eslint-disable-next-line node/no-process-env
-    const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+    const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;    
+    boolean returnValue = false;
 
-    return (typeof rejectUnauthorized === 'undefined' || rejectUnauthorized === '1' || rejectUnauthorized === 'yes' || rejectUnauthorized === 'true');
+    if (typeof rejectUnauthorized === boolean) {
+      returnValue = rejectUnauthorized
+    } else if (typeof rejectUnauthorized === number) {
+      returnValue = rejectUnauthorized === 1
+    } else if (typeof rejectUnauthorized === string){
+      returnValue = ['true', 't', 'yes', 'y', 'on', '1'].includes(rejectUnauthorized.trim().toLowerCase());
+    }
+
+    return returnValue;
   }
 
   public abstract createConnection (configuration: ConnectionConfigurationType, callback: ConnectionCallbackType): void;
