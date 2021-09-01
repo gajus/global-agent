@@ -166,13 +166,13 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
  * @property environmentVariableNamespace Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables. (Default: `GLOBAL_AGENT_`)
  * @property forceGlobalAgent Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent. (Default: `true`)
  * @property socketConnectionTimeout Destroys socket if connection is not established within the timeout. (Default: `60000`)
- * @property ca An array of CA certificates that is trusted for secure connections to the registry. (Default: '[]')
+ * @property ca Single CA certificate or an array of CA certificates that is trusted for secure connections to the registry.
  */
 type ProxyAgentConfigurationInputType = {|
   +environmentVariableNamespace?: string,
   +forceGlobalAgent?: boolean,
   +socketConnectionTimeout?: number,
-  +ca?: string[],
+  +ca?: string[] | string,
 |};
 
 (configurationInput: ProxyAgentConfigurationInputType) => ProxyAgentConfigurationType;
@@ -218,14 +218,22 @@ if (typeof https.globalAgent.addCACertificates === 'function') {
 Method Definition:
 ```js
 /**
- * This method can be used to add an array of ca certificates
- * @param {*} ca an array of ca certificates
+ * This method can be used to append new ca certificates to existing ca certificates
+ * @param {string | string[]} ca a ca certificate or an array of ca certificates
  */
-addCACertificates (ca: object) {
-  // Concat valid ca certificates with the existing ca certificates.
-  if (ca) {
-    this.ca = this.ca.concat(ca);
-  }
+public addCACertificates (ca: string[] | string) {
+  if (!ca) {
+    log.error('Invalid input ca certificate');
+  } else if (this.ca) {
+    if (typeof ca === typeof this.ca) {
+      // concat valid ca certificates with the existing certificates,
+      this.ca = this.ca.concat(ca);
+    } else {
+      log.error('Input ca certificate type mismatched with existing ca certificate type');
+    }
+  } else {
+    this.ca = ca;
+  }  
 }
 ```
 
@@ -241,10 +249,11 @@ if (typeof https.globalAgent.clearCACertificates === 'function') {
 Method Definition:
 ```js
 /**
- * Clears existing CA Certificates
+ * This method clears existing CA Certificates.
+ * It sets ca to undefined
  */
-clearCACertificates () {
-  this.ca = [];
+public clearCACertificates () {
+  this.ca = undefined;
 }
 ```
 
