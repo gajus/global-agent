@@ -74,12 +74,14 @@ abstract class Agent {
    * @param {string | string[]} ca a ca certificate or an array of ca certificates
    */
   public addCACertificates (ca: string | string[]) {
-    // concat valid ca certificates with the existing certificates,
-    if (this.ca) {
+    if (!ca) {
+      log.error("Invalid input ca certificate");
+    } else if (this.ca) {
       if (typeof ca === typeof this.ca) {
+        // concat valid ca certificates with the existing certificates,
         this.ca = this.ca.concat(ca);
       } else {
-        log.error("Input ca type mismatched with existing ca type");
+        log.error("Input ca certificate's type mismatched with existing ca certificate's type");
       }
     } else {
       this.ca = ca;
