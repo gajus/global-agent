@@ -219,7 +219,7 @@ Method Definition:
 ```js
 /**
  * This method can be used to append new ca certificates to existing ca certificates
- * @param {string | string[]} ca a ca certificate or an array of ca certificates
+ * @param {string[] | string} ca a ca certificate or an array of ca certificates
  */
 public addCACertificates (ca: string[] | string) {
   if (!ca) {
