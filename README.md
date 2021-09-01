@@ -227,13 +227,17 @@ public addCACertificates (ca: string[] | string) {
   } else if (this.ca) {
     if (typeof ca === typeof this.ca) {
       // concat valid ca certificates with the existing certificates,
-      this.ca = this.ca.concat(ca);
+      if (typeof this.ca === 'string') {
+        this.ca = this.ca.concat(ca as string);
+      } else {
+        this.ca = this.ca.concat(ca as string[]);
+      }
     } else {
       log.error('Input ca certificate type mismatched with existing ca certificate type');
     }
   } else {
     this.ca = ca;
-  }  
+  }
 }
 ```
 
