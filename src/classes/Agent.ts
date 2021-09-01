@@ -75,13 +75,15 @@ abstract class Agent {
    */
   public addCACertificates (ca: string | string[]) {
     // concat valid ca certificates with the existing certificates,
-    if (ca) {
-      if(this.ca) {
+    if (this.ca) {
+      if (typeof ca === typeof this.ca) {
         this.ca = this.ca.concat(ca);
       } else {
-        this.ca = ca;
+        log.error("Input ca type mismatched with existing ca type");
       }
-    }
+    } else {
+      this.ca = ca;
+    }  
   }
 
   /**
