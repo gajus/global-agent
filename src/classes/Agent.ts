@@ -81,7 +81,7 @@ abstract class Agent {
         // concat valid ca certificates with the existing certificates,
         this.ca = this.ca.concat(ca);
       } else {
-        log.error('Input ca certificate type mismatched with existing ca certificate type');
+        log.error(`Input ca certificate's type mismatched with existing ca certificate's type`);
       }
     } else {
       this.ca = ca;
