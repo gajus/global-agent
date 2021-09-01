@@ -335,7 +335,7 @@ serial('Test addCACertificates and clearCACertificates methods', async (t) => {
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
   const globalAgent: any = https.globalAgent;
-  t.is(globalAgent.ca.length, 0);
+  t.is(globalAgent.ca, undefined);
   globalAgent.addCACertificates(['test-ca-certficate1', 'test-ca-certficate2']);
   globalAgent.addCACertificates(['test-ca-certficate3']);
   const result = ['test-ca-certficate1', 'test-ca-certficate2', 'test-ca-certficate3'];
@@ -363,7 +363,25 @@ serial('Test addCACertificates when passed ca is a string', async (t) => {
   t.is(response.body, 'OK');
 });
 
-serial('Test addCACertificates when passed ca array is null or undefined', async (t) => {
+serial('Test addCACertificates when input ca is a string and existing ca is array', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent({ca: ['test-ca']});
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.ca.length, 1);
+  globalAgent.addCACertificates('test-ca-certficate1');
+  t.is(globalAgent.ca.length, 1);
+  t.is(JSON.stringify(globalAgent.ca), JSON.stringify(['test-ca']))
+  const response: HttpResponseType = await new Promise((resolve) => {
+    // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
+    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, servername: '127.0.0.1'}, createHttpResponseResolver(resolve));
+  });
+  t.is(response.body, 'OK');
+});
+
+serial('Test addCACertificates when input ca array is null or undefined', async (t) => {
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
