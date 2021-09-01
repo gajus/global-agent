@@ -407,7 +407,10 @@ serial('Test initializing ca certificate property while creating global proxy ag
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
   const globalAgent: any = https.globalAgent;
   t.is(globalAgent.ca.length, 1);
+  globalAgent.addCACertificates(['test-ca1']);
+  t.is(globalAgent.ca.length, 2);
   t.is(globalAgent.ca[0], 'test-ca');
+  t.is(globalAgent.ca[1], 'test-ca1');
   const response: HttpResponseType = await new Promise((resolve) => {
     // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
     https.get('https://127.0.0.1', {rejectUnauthorized: false, secureEndpoint: true}, createHttpResponseResolver(resolve));
