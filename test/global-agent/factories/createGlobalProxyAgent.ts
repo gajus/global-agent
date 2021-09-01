@@ -342,7 +342,25 @@ serial('Test addCACertificates and clearCACertificates methods', async (t) => {
   t.is(globalAgent.ca.length, result.length);
   t.is(JSON.stringify(globalAgent.ca), JSON.stringify(result));
   globalAgent.clearCACertificates();
-  t.is(globalAgent.ca.length, 0);
+  t.is(globalAgent.ca, undefined);
+});
+
+serial('Test addCACertificates when passed ca is a string', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.ca, undefined);
+  globalAgent.addCACertificates('test-ca-certficate1');
+  globalAgent.addCACertificates('test-ca-certficate2');
+  t.is(globalAgent.ca, 'test-ca-certficate1test-ca-certficate2');
+  const response: HttpResponseType = await new Promise((resolve) => {
+    // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
+    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, servername: '127.0.0.1'}, createHttpResponseResolver(resolve));
+  });
+  t.is(response.body, 'OK');
 });
 
 serial('Test addCACertificates when passed ca array is null or undefined', async (t) => {
@@ -352,10 +370,10 @@ serial('Test addCACertificates when passed ca array is null or undefined', async
 
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
   const globalAgent: any = https.globalAgent;
-  t.is(globalAgent.ca.length, 0);
+  t.is(globalAgent.ca, undefined);
   globalAgent.addCACertificates(undefined);
   globalAgent.addCACertificates(null);
-  t.is(globalAgent.ca.length, 0);
+  t.is(globalAgent.ca, undefined);
   const response: HttpResponseType = await new Promise((resolve) => {
     // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
     https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, servername: '127.0.0.1'}, createHttpResponseResolver(resolve));
