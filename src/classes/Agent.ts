@@ -51,7 +51,6 @@ abstract class Agent {
 
   public socketConnectionTimeout: number;
 
-  // ca property is an array of ca certificates
   public ca: string | string[] | undefined;
 
   public constructor (
@@ -71,8 +70,8 @@ abstract class Agent {
   }
 
   /**
-   * This method can be used to add an array of ca certificates
-   * @param {string | string[]} ca single ca certificate or an array of ca certificates
+   * This method can be used to append new ca certificates to existing ca certificates
+   * @param {string | string[]} ca a ca certificate or an array of ca certificates
    */
   public addCACertificates (ca: string | string[]) {
     // concat valid ca certificates with the existing certificates,
@@ -86,7 +85,7 @@ abstract class Agent {
   }
 
   /**
-   * Clears existing CA Certificates.
+   * This method clears existing CA Certificates.
    * It sets ca to undefined
    */
   public clearCACertificates () {
