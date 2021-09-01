@@ -51,7 +51,7 @@ abstract class Agent {
 
   public socketConnectionTimeout: number;
 
-  public ca: string | string[] | undefined;
+  public ca: string[] | string | undefined;
 
   public constructor (
     isProxyConfigured: IsProxyConfiguredMethodType,
@@ -59,7 +59,7 @@ abstract class Agent {
     getUrlProxy: GetUrlProxyMethodType,
     fallbackAgent: AgentType,
     socketConnectionTimeout: number,
-    ca: string | string[] | undefined,
+    ca: string[] | string | undefined,
   ) {
     this.fallbackAgent = fallbackAgent;
     this.isProxyConfigured = isProxyConfigured;
@@ -71,9 +71,9 @@ abstract class Agent {
 
   /**
    * This method can be used to append new ca certificates to existing ca certificates
-   * @param {string | string[]} ca a ca certificate or an array of ca certificates
+   * @param {string[] | string} ca a ca certificate or an array of ca certificates
    */
-  public addCACertificates (ca: string | string[]) {
+  public addCACertificates (ca: string[] | string) {
     if (!ca) {
       log.error('Invalid input ca certificate');
     } else if (this.ca) {
@@ -85,7 +85,7 @@ abstract class Agent {
       }
     } else {
       this.ca = ca;
-    }  
+    }
   }
 
   /**
