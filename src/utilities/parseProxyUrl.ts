@@ -13,8 +13,8 @@ export default (url: string) => {
     throw new UnexpectedStateError('Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL must not have hash.');
   }
 
-  if (urlTokens.protocol !== 'http:') {
-    throw new UnexpectedStateError('Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL protocol must be "http:".');
+  if (urlTokens.protocol !== 'http:' && urlTokens.protocol !== 'https:') {
+    throw new UnexpectedStateError('Unsupported `GLOBAL_AGENT.HTTP_PROXY` or `GLOBAL_AGENT.HTTPS_PROXY` configuration value: URL protocol must be "http:" or "https:".');
   }
 
   let port = 80;
