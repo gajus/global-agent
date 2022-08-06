@@ -13,12 +13,12 @@ test('extracts authorization', (t) => {
   t.is(parseProxyUrl('http://foo:bar@0.0.0.0').authorization, 'foo:bar');
 });
 
-test('throws an error if protocol is not "http:"', (t) => {
+test('throws an error if protocol is not "http:" or "https:"', (t) => {
   const error = t.throws(() => {
-    parseProxyUrl('https://0.0.0.0:3000');
+    parseProxyUrl('ws://0.0.0.0:3000');
   });
 
-  t.is(error.message, 'Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL protocol must be "http:".');
+  t.is(error.message, 'Unsupported `GLOBAL_AGENT.HTTP_PROXY` or `GLOBAL_AGENT.HTTPS_PROXY` configuration value: URL protocol must be "http:" or "https:".');
 });
 
 test('throws an error if query is present', (t) => {

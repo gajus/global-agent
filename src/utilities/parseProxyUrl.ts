@@ -14,7 +14,8 @@ export default (url: string) => {
   }
 
   if (urlTokens.protocol !== 'http:' && urlTokens.protocol !== 'https:') {
-    throw new UnexpectedStateError('Unsupported `GLOBAL_AGENT.HTTP_PROXY` or `GLOBAL_AGENT.HTTPS_PROXY` configuration value: URL protocol must be "http:" or "https:".');
+    const errorMessage = 'Unsupported `GLOBAL_AGENT.HTTP_PROXY` or `GLOBAL_AGENT.HTTPS_PROXY` configuration value: URL protocol must be "http:" or "https:".';
+    throw new UnexpectedStateError(errorMessage);
   }
 
   let port = 80;
