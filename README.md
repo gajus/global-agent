@@ -194,7 +194,7 @@ type ProxyAgentConfigurationInputType = {|
 
 `global.GLOBAL_AGENT` has the following properties:
 
-|Name|Description|Configurable|
+|Name|Configurable|Description|
 |---|---|---|
 |`HTTP_PROXY`|Yes|Sets HTTP proxy to use.|
 |`HTTPS_PROXY`|Yes|Sets a distinct proxy to use for HTTPS requests.|
