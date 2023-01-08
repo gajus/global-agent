@@ -45,9 +45,9 @@ class HttpsProxyAgent extends Agent {
       const statusLine = data.toString().split('\r\n')[0];
       const statusLineExp = /^HTTP\/(\d)\.(\d) (\d{3}) ?(.*)$/;
 
-      const statusCode = +statusLineExp.exec(statusLine)[3];
+      const statusCode = statusLineExp.exec(statusLine)?.[3];
 
-      if (statusCode >= 400) {
+      if (typeof statusCode === 'string' && +statusCode >= 400) {
         const err = new Error(`Proxy server refused connecting to '${configuration.host}:${configuration.port}' (${statusLine})`);
         callback(err);
         socket.destroy();
