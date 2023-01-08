@@ -40,7 +40,20 @@ class HttpsProxyAgent extends Agent {
       callback(error);
     });
 
-    socket.once('data', () => {
+    socket.once('data', (data) => {
+      // Proxies with HTTPS as protocal are not allowed by parseProxyUrl(), so it should be safe to assume that the response is plain text
+      const statusLine = data.toString().split('\r\n')[0];
+      const statusLineExp = /^HTTP\/(\d)\.(\d) (\d{3}) ?(.*)$/;
+
+      const statusCode = +statusLineExp.exec(statusLine)[3];
+
+      if (statusCode >= 400) {
+        const err = new Error(`Proxy server refused connecting to '${configuration.host}:${configuration.port}' (${statusLine})`);
+        callback(err);
+        socket.destroy();
+        return;
+      }
+
       const secureSocket = tls.connect({
         ...configuration.tls,
         socket,
