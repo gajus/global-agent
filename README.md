@@ -124,7 +124,7 @@ global.GLOBAL_AGENT.HTTP_PROXY = 'http://127.0.0.1:8002';
 
 ```
 
-The first HTTP request is going to use http://127.0.0.1:8001 proxy and the secord request is going to use http://127.0.0.1:8002.
+The first HTTP request is going to use http://127.0.0.1:8001 proxy and the second request is going to use http://127.0.0.1:8002.
 
 All `global-agent` configuration is available under `global.GLOBAL_AGENT` namespace.
 
