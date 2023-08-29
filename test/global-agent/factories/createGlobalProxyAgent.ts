@@ -53,6 +53,10 @@ const anyproxyDefaultRules = {
 const defaultHttpAgent = http.globalAgent;
 const defaultHttpsAgent = https.globalAgent;
 
+// Backup original value of NODE_TLS_REJECT_UNAUTHORIZED
+// eslint-disable-next-line node/no-process-env
+const defaultNodeTlsRejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+
 let lastPort = 3_000;
 
 let localProxyServers: ProxyServerType[] = [];
@@ -95,6 +99,10 @@ afterEach(() => {
   }
 
   localHttpServers = [];
+
+  // Reset NODE_TLS_REJECT_UNAUTHORIZED to original value
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = defaultNodeTlsRejectUnauthorized;
 });
 
 type HttpResponseType = {
@@ -213,6 +221,201 @@ serial('proxies HTTP request with proxy-authorization header', async (t) => {
   t.is(response.body, 'OK');
 
   t.is(beforeSendRequest.firstCall.args[0].requestOptions.headers['proxy-authorization'], 'Basic Zm9v');
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  const {NODE_TLS_REJECT_UNAUTHORIZED, ...restEnvironments} = process.env; // eslint-disable-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line node/no-process-env
+  process.env = restEnvironments;
+  // eslint-disable-next-line node/no-process-env
+  process.env.GLOBAL_AGENT_FORCE_GLOBAL_AGENT = 'true';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), true);
+
+  const response: HttpResponseType = await new Promise((resolve) => {
+    http.get('http://127.0.0.1', createHttpResponseResolver(resolve));
+  });
+
+  t.is(response.body, 'OK');
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = null', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'null';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), false);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 1', async (t) => {
+  // @ts-expect-error it is expected as we wanted to set process variable with int
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 1;
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), true);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = 0', async (t) => {
+  // @ts-expect-error it is expected as we wanted to set process variable with int
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), false);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = true', async (t) => {
+  // @ts-expect-error it is expected as we wanted to set process variable with boolean
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = true;
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), true);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = false', async (t) => {
+  // @ts-expect-error it is expected as we wanted to set process variable with boolean
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = false;
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), false);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = yes', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'yes';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), true);
+});
+
+serial('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = no', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 'no';
+  const globalProxyAgent = createGlobalProxyAgent();
+  const proxyServer = await createProxyServer();
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.getRejectUnauthorized(), false);
+});
+
+serial('Test addCACertificates and clearCACertificates methods', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.ca, undefined);
+  globalAgent.addCACertificates(['test-ca-certficate1', 'test-ca-certficate2']);
+  globalAgent.addCACertificates(['test-ca-certficate3']);
+  const result = ['test-ca-certficate1', 'test-ca-certficate2', 'test-ca-certficate3'];
+  t.is(globalAgent.ca.length, result.length);
+  t.is(JSON.stringify(globalAgent.ca), JSON.stringify(result));
+  globalAgent.clearCACertificates();
+  t.is(globalAgent.ca, undefined);
+});
+
+serial('Test addCACertificates when passed ca is a string', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.ca, undefined);
+  globalAgent.addCACertificates('test-ca-certficate1');
+  globalAgent.addCACertificates('test-ca-certficate2');
+  t.is(globalAgent.ca, 'test-ca-certficate1test-ca-certficate2');
+  const response: HttpResponseType = await new Promise((resolve) => {
+    // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
+    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, servername: '127.0.0.1'}, createHttpResponseResolver(resolve));
+  });
+  t.is(response.body, 'OK');
+});
+
+serial('Test addCACertificates when input ca is a string and existing ca is array', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent({ca: ['test-ca']});
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.ca.length, 1);
+  globalAgent.addCACertificates('test-ca-certficate1');
+  t.is(globalAgent.ca.length, 1);
+  t.is(JSON.stringify(globalAgent.ca), JSON.stringify(['test-ca']));
+  const response: HttpResponseType = await new Promise((resolve) => {
+    // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
+    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, servername: '127.0.0.1'}, createHttpResponseResolver(resolve));
+  });
+  t.is(response.body, 'OK');
+});
+
+serial('Test addCACertificates when input ca array is null or undefined', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.ca, undefined);
+  globalAgent.addCACertificates(undefined);
+  globalAgent.addCACertificates(null);
+  t.is(globalAgent.ca, undefined);
+  const response: HttpResponseType = await new Promise((resolve) => {
+    // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
+    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, servername: '127.0.0.1'}, createHttpResponseResolver(resolve));
+  });
+  t.is(response.body, 'OK');
+});
+
+serial('Test initializing ca certificate property while creating global proxy agent', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent({ca: ['test-ca']});
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+  const globalAgent: any = https.globalAgent;
+  t.is(globalAgent.ca.length, 1);
+  globalAgent.addCACertificates(['test-ca1']);
+  t.is(globalAgent.ca.length, 2);
+  t.is(globalAgent.ca[0], 'test-ca');
+  t.is(globalAgent.ca[1], 'test-ca1');
+  const response: HttpResponseType = await new Promise((resolve) => {
+    // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
+    https.get('https://127.0.0.1', {rejectUnauthorized: false, secureEndpoint: true}, createHttpResponseResolver(resolve));
+  });
+  t.is(response.body, 'OK');
 });
 
 serial('proxies HTTPS request', async (t) => {
