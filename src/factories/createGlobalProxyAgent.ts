@@ -1,8 +1,23 @@
 import http from 'http';
 import https from 'https';
-import {
-  boolean as parseBoolean,
-} from 'boolean';
+// Lightweight parseBoolean to avoid a small third-party dependency 'boolean'
+function parseBoolean(value: unknown): boolean {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value !== 0;
+  if (typeof value === 'string') {
+    switch (value.trim().toLowerCase()) {
+      case '1':
+      case 'true':
+      case 'yes':
+      case 'y':
+      case 'on':
+        return true;
+      default:
+        return false;
+    }
+  }
+  return Boolean(value);
+}
 import {
   omitUndefined,
 } from 'omit-undefined';
