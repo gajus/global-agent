@@ -47,12 +47,11 @@
     "babel-plugin-transform-export-default-name": "^2.1.0",
     "coveralls": "^3.1.1",
     "del-cli": "^4.0.1",
-    "eslint": "^7.31.0",
-    "eslint-config-canonical": "^26.2.3",
     "get-port": "^5.1.1",
     "got": "^11.8.2",
     "husky": "^7.0.1",
     "nyc": "^15.1.0",
+    "oxlint": "^1.43.0",
     "pem": "^1.14.4",
     "request": "^2.88.2",
     "semantic-release": "^25.0.3",
@@ -87,7 +86,7 @@
   },
   "scripts": {
     "build": "del-cli ./dist && tsc",
-    "lint": "eslint ./src ./test && tsc",
+    "lint": "oxlint ./src ./test && tsc",
     "test": "ava --verbose --serial",
     "create-readme": "gitdown ./.README/README.md --output-file ./README.md"
   },

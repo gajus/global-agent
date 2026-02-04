@@ -136,7 +136,7 @@ abstract class Agent {
     } else if (request.method === 'CONNECT') {
       requestUrl = 'https://' + request.path;
     } else {
-      requestUrl = this.protocol + '//' + (configuration.hostname ?? configuration.host) + (configuration.port === 80 ?? configuration.port === 443 ? '' : ':' + configuration.port) + request.path;
+      requestUrl = this.protocol + '//' + (configuration.hostname ?? configuration.host) + (configuration.port === 80 || configuration.port === 443 ? '' : ':' + configuration.port) + request.path;
     }
 
     // If a request should go to a local socket, proxying it through an HTTP
