@@ -307,6 +307,33 @@ serial('forwards requests matching NO_PROXY', async (t) => {
   t.is(response.body, 'DIRECT');
 });
 
+serial('forwards requests that go to a socket', async (t) => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  // not relevant as traffic shouldn't go through proxy
+  globalProxyAgent.HTTP_PROXY = 'localhost:10324';
+
+  var server = http.createServer(function (req, res) {
+    res.writeHead(200);
+    res.write('OK');
+    res.end();
+  });
+
+  t.teardown(() => {
+    server.close();
+  });
+  server.listen('/tmp/test.sock');
+
+  const response: HttpResponseType = await new Promise((resolve) => {
+    http.get({
+        socketPath: '/tmp/test.sock',
+        path: '/endpoint',
+      }, createHttpResponseResolver(resolve)
+    );
+  });
+  t.is(response.body, 'OK');
+});
+
 serial('proxies HTTP request (using http.get(host))', async (t) => {
   const globalProxyAgent = createGlobalProxyAgent();
 
