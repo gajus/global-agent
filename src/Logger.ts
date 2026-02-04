@@ -9,10 +9,14 @@ export type Logger = {
   warn: LogMethod,
 };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop = () => {};
+
 const createNoopLogger = (): Logger => {
-  const noop = () => {};
   return {
-    child: () => createNoopLogger(),
+    child: () => {
+      return createNoopLogger();
+    },
     debug: noop,
     error: noop,
     info: noop,
@@ -23,29 +27,44 @@ const createNoopLogger = (): Logger => {
 
 let currentLogger: Logger = createNoopLogger();
 
-export const setLogger = (logger: Logger): void => {
-  currentLogger = logger;
+export const setLogger = (newLogger: Logger): void => {
+  currentLogger = newLogger;
 };
 
 const createDelegatingLogger = (getContext: () => object): Logger => {
   const getLogger = () => {
-    let logger = currentLogger;
+    let targetLogger = currentLogger;
     for (const [key, value] of Object.entries(getContext())) {
-      logger = logger.child({[key]: value});
+      targetLogger = targetLogger.child({[key]: value});
     }
-    return logger;
+
+    return targetLogger;
   };
 
   return {
     child: (context: object) => {
-      return createDelegatingLogger(() => ({...getContext(), ...context}));
+      return createDelegatingLogger(() => {
+        return {...getContext(), ...context};
+      });
     },
-    debug: (context, message) => getLogger().debug(context, message),
-    error: (context, message) => getLogger().error(context, message),
-    info: (context, message) => getLogger().info(context, message),
-    trace: (context, message) => getLogger().trace(context, message),
-    warn: (context, message) => getLogger().warn(context, message),
+    debug: (context, message) => {
+      getLogger().debug(context, message);
+    },
+    error: (context, message) => {
+      getLogger().error(context, message);
+    },
+    info: (context, message) => {
+      getLogger().info(context, message);
+    },
+    trace: (context, message) => {
+      getLogger().trace(context, message);
+    },
+    warn: (context, message) => {
+      getLogger().warn(context, message);
+    },
   };
 };
 
-export default createDelegatingLogger(() => ({package: 'global-agent'}));
+export const logger = createDelegatingLogger(() => {
+  return {package: 'global-agent'};
+});

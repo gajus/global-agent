@@ -4,7 +4,9 @@ import net from 'net';
 import {
   serializeError,
 } from 'serialize-error';
-import Logger from '../Logger';
+import {
+  logger,
+} from '../Logger';
 import type {
   AgentType,
   ConnectionCallbackType,
@@ -15,7 +17,7 @@ import type {
   ProtocolType,
 } from '../types';
 
-const log = Logger.child({
+const log = logger.child({
   namespace: 'Agent',
 });
 

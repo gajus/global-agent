@@ -1,5 +1,7 @@
 import createGlobalThis from 'globalthis';
-import Logger from '../Logger';
+import {
+  logger,
+} from '../Logger';
 import {
   createGlobalProxyAgent,
 } from '../factories';
@@ -9,7 +11,7 @@ import type {
 
 const globalThis: any = createGlobalThis();
 
-const log = Logger.child({
+const log = logger.child({
   namespace: 'bootstrap',
 });
 

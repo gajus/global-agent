@@ -1,4 +1,6 @@
-import Logger from '../Logger';
+import {
+  logger,
+} from '../Logger';
 
 type ProxyController = {
   HTTP_PROXY: string | null,
@@ -6,7 +8,7 @@ type ProxyController = {
   NO_PROXY: string | null,
 };
 
-const log = Logger.child({
+const log = logger.child({
   namespace: 'createProxyController',
 });
 

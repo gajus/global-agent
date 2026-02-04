@@ -4,7 +4,8 @@ import {
   omitUndefined,
 } from 'omit-undefined';
 import semverGte from 'semver/functions/gte';
-import Logger, {
+import {
+  logger,
   setLogger,
 } from '../Logger';
 import {
@@ -33,7 +34,7 @@ const httpRequest = http.request;
 const httpsGet = https.get;
 const httpsRequest = https.request;
 
-const log = Logger.child({
+const log = logger.child({
   namespace: 'createGlobalProxyAgent',
 });
 
