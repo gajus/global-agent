@@ -4,7 +4,9 @@ import {
   omitUndefined,
 } from 'omit-undefined';
 import semverGte from 'semver/functions/gte';
-import Logger from '../Logger';
+import Logger, {
+  setLogger,
+} from '../Logger';
 import {
   HttpProxyAgent,
   HttpsProxyAgent,
@@ -59,6 +61,10 @@ const createConfiguration = (configurationInput: ProxyAgentConfigurationInputTyp
 
 export default (configurationInput: ProxyAgentConfigurationInputType = defaultConfigurationInput) => {
   const configuration = createConfiguration(configurationInput);
+
+  if (configurationInput.logger) {
+    setLogger(configurationInput.logger);
+  }
 
   const proxyController = createProxyController();
 

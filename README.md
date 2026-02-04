@@ -12,7 +12,6 @@ Global HTTP/HTTPS proxy configurable using environment variables.
   * [Setup proxy using `bootstrap` routine](#setup-proxy-using-bootstrap-routine)
   * [Runtime configuration](#runtime-configuration)
   * [Exclude URLs](#exclude-urls)
-  * [Enable logging](#enable-logging)
 * [API](#api)
   * [`createGlobalProxyAgent`](#createglobalproxyagent)
   * [Environment variables](#environment-variables)
@@ -142,20 +141,6 @@ says to contact all machines with the 'foo.com' TLD and 'baz.com' domains direct
 
 The environment variable `GLOBAL_AGENT_HTTPS_PROXY` can be set to specify a separate proxy for HTTPS requests. When this variable is not set `GLOBAL_AGENT_HTTP_PROXY` is used for both HTTP and HTTPS requests.
 
-### Enable logging
-
-`global-agent` is using [`roarr`](https://www.npmjs.com/package/roarr) logger to log HTTP requests and response (HTTP status code and headers), e.g.
-
-```json
-{"context":{"program":"global-agent","namespace":"Agent","logLevel":10,"destination":"http://gajus.com","proxy":"http://127.0.0.1:8076"},"message":"proxying request","sequence":1,"time":1556269669663,"version":"1.0.0"}
-{"context":{"program":"global-agent","namespace":"Agent","logLevel":10,"headers":{"content-type":"text/plain","content-length":"2","date":"Fri, 26 Apr 2019 12:07:50 GMT","connection":"close"},"requestId":6,"statusCode":200},"message":"proxying response","sequence":2,"time":1557133856955,"version":"1.0.0"}
-
-```
-
-Export `ROARR_LOG=true` environment variable to enable log printing to stdout.
-
-Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print the logs.
-
 ## API
 
 ### `createGlobalProxyAgent`
@@ -166,16 +151,50 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
  * @property forceGlobalAgent Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent. (Default: `true`)
  * @property socketConnectionTimeout Destroys socket if connection is not established within the timeout. (Default: `60000`)
  * @property ca Single CA certificate or an array of CA certificates that is trusted for secure connections to the registry.
+ * @property logger Custom logger instance for debug logging. Must implement `child`, `debug`, `error`, `info`, `trace`, and `warn` methods.
  */
 type ProxyAgentConfigurationInputType = {|
   +environmentVariableNamespace?: string,
   +forceGlobalAgent?: boolean,
   +socketConnectionTimeout?: number,
   +ca?: string[] | string,
+  +logger?: Logger,
 |};
 
 (configurationInput: ProxyAgentConfigurationInputType) => ProxyAgentConfigurationType;
 
+```
+
+### Custom Logger
+
+You can provide a custom logger to `global-agent` for debugging purposes. The logger must implement the following interface:
+
+```ts
+type Logger = {
+  child: (context: object) => Logger,
+  debug: (context: object | string, message?: string) => void,
+  error: (context: object | string, message?: string) => void,
+  info: (context: object | string, message?: string) => void,
+  trace: (context: object | string, message?: string) => void,
+  warn: (context: object | string, message?: string) => void,
+};
+```
+
+Example using a custom logger:
+
+```js
+import { createGlobalProxyAgent } from 'global-agent';
+
+createGlobalProxyAgent({
+  logger: {
+    child: () => logger,
+    debug: console.debug,
+    error: console.error,
+    info: console.info,
+    trace: console.trace,
+    warn: console.warn,
+  },
+});
 ```
 
 ### Environment variables

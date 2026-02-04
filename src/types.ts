@@ -10,6 +10,9 @@ import type {
 import type {
   TLSSocket,
 } from 'tls';
+import type {
+  Logger,
+} from './Logger';
 
 export type ProxyConfigurationType = {
   authorization: string | null,
@@ -56,6 +59,7 @@ export type ProxyAgentConfigurationInputType = {
   forceGlobalAgent?: boolean,
   socketConnectionTimeout?: number,
   ca?: string[] | string,
+  logger?: Logger,
 };
 
 export type ProxyAgentConfigurationType = {

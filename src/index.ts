@@ -4,3 +4,6 @@ export {
 export {
   createGlobalProxyAgent,
 } from './factories';
+export type {
+  Logger,
+} from './Logger';
