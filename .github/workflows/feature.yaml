@@ -1,7 +1,10 @@
 jobs:
   test:
-    name: Test
+    name: Test (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20', '22', '24']
     steps:
       - name: setup repository
         uses: actions/checkout@v3
@@ -10,7 +13,7 @@ jobs:
       - name: setup node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: ${{ matrix.node-version }}
       - name: setup npm
         uses: npm/action-setup@v4
         with:

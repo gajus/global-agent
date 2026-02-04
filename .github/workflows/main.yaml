@@ -1,5 +1,26 @@
 jobs:
+  test:
+    name: Test (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20', '22', '24']
+    steps:
+      - name: setup repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+    timeout-minutes: 10
   release:
+    needs: test
     environment: release
     name: Release
     permissions:
@@ -18,8 +39,6 @@ jobs:
         with:
           node-version: '24'
       - run: npm install
-      - run: npm run lint
-      - run: npm run test
       - run: npm run build
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
