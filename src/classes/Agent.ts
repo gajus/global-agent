@@ -1,5 +1,6 @@
 import type * as http from 'http';
 import type * as https from 'https';
+import net from 'net';
 import {
   serializeError,
 } from 'serialize-error';
@@ -71,6 +72,7 @@ abstract class Agent {
 
   /**
    * This method can be used to append new ca certificates to existing ca certificates
+   *
    * @param {string[] | string} ca a ca certificate or an array of ca certificates
    */
   public addCACertificates (ca: string[] | string) {
@@ -141,10 +143,11 @@ abstract class Agent {
     if (configuration.socketPath) {
       log.trace({
         destination: configuration.socketPath,
-      }, "not proxying request; destination is a socket");
+      }, 'not proxying request; destination is a socket');
 
       // @ts-expect-error seems like we are using wrong type for fallbackAgent.
       this.fallbackAgent.addRequest(request, configuration);
+
       return;
     }
 
@@ -219,6 +222,10 @@ abstract class Agent {
     // >   ca, cert, ciphers, clientCertEngine, crl, dhparam, ecdhCurve, honorCipherOrder,
     // >   key, passphrase, pfx, rejectUnauthorized, secureOptions, secureProtocol, servername, sessionIdContext.
     if (configuration.secureEndpoint) {
+      // Determine servername - Node.js doesn't allow IP addresses as servername
+      const host = configuration.servername ?? connectionConfiguration.host;
+      const servername = net.isIP(host) ? undefined : host;
+
       connectionConfiguration.tls = {
         ca: configuration.ca ?? this.ca,
         cert: configuration.cert,
@@ -234,7 +241,7 @@ abstract class Agent {
         rejectUnauthorized: configuration.rejectUnauthorized ?? this.getRejectUnauthorized(),
         secureOptions: configuration.secureOptions,
         secureProtocol: configuration.secureProtocol,
-        servername: configuration.servername ?? connectionConfiguration.host,
+        servername,
         sessionIdContext: configuration.sessionIdContext,
       };
     }

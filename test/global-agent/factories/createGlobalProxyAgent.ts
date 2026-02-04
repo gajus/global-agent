@@ -1,14 +1,10 @@
-/* eslint-disable ava/use-test */
-
 import type {
   IncomingMessage,
   IncomingHttpHeaders,
 } from 'http';
 import http from 'http';
 import https from 'https';
-import AnyProxy, {
-  ProxyServer,
-} from 'anyproxy';
+import net from 'net';
 import {
   serial,
   before,
@@ -18,8 +14,11 @@ import {
 import axios from 'axios';
 import getPort from 'get-port';
 import got from 'got';
+import pem from 'pem';
 import makeRequest from 'request';
-import sinon from 'sinon';
+import {
+  stub,
+} from 'sinon';
 import createGlobalProxyAgent from '../../../src/factories/createGlobalProxyAgent';
 
 type ProxyServerType = {
@@ -33,21 +32,25 @@ type HttpServerType = {
   url: string,
 };
 
-const anyproxyDefaultRules = {
-  beforeDealHttpsRequest: async () => {
-    return true;
+type HttpsServerType = {
+  port: number,
+  stop: () => void,
+  url: string,
+};
+
+type ProxyRules = {
+  beforeSendRequest?: (requestDetail: {
+    requestOptions: {
+      headers: Record<string, string>,
+    },
+  }) => {
+    response: {
+      body: string,
+      header: Record<string, string>,
+      statusCode: number,
+    },
   },
-  beforeSendRequest: () => {
-    return {
-      response: {
-        body: 'OK',
-        header: {
-          'content-type': 'text/plain',
-        },
-        statusCode: 200,
-      },
-    };
-  },
+  onConnect?: (request: http.IncomingMessage) => void,
 };
 
 const defaultHttpAgent = http.globalAgent;
@@ -61,6 +64,11 @@ let lastPort = 3_000;
 
 let localProxyServers: ProxyServerType[] = [];
 let localHttpServers: HttpServerType[] = [];
+let localHttpsServers: HttpsServerType[] = [];
+let generatedCerts: {
+  cert: string,
+  key: string,
+} | null = null;
 
 const getNextPort = (): Promise<number> => {
   return getPort({
@@ -68,18 +76,34 @@ const getNextPort = (): Promise<number> => {
   });
 };
 
-before(() => {
-  if (AnyProxy.utils.certMgr.ifRootCAFileExists()) {
-    return;
-  }
+// Generate self-signed certificates for HTTPS testing
+const generateCertificates = (): Promise<{
+  cert: string,
+  key: string,
+}> => {
+  return new Promise((resolve, reject) => {
+    if (generatedCerts) {
+      resolve(generatedCerts);
 
-  // @see https://github.com/alibaba/anyproxy/issues/332#issuecomment-486705002
-  AnyProxy.utils.certMgr.generateRootCA((error) => {
-    if (error) {
-      // eslint-disable-next-line no-console
-      console.error('cannot generate certificate', error);
+      return;
     }
+
+    pem.createCertificate({days: 1, selfSigned: true}, (error, keys) => {
+      if (error) {
+        reject(error);
+
+        return;
+      }
+
+      generatedCerts = {cert: keys.certificate, key: keys.serviceKey};
+      resolve(generatedCerts);
+    });
   });
+};
+
+before(async () => {
+  // Pre-generate certificates
+  await generateCertificates();
 });
 
 beforeEach(() => {
@@ -99,6 +123,12 @@ afterEach(() => {
   }
 
   localHttpServers = [];
+
+  for (const localHttpsServer of localHttpsServers) {
+    localHttpsServer.stop();
+  }
+
+  localHttpsServers = [];
 
   // Reset NODE_TLS_REJECT_UNAUTHORIZED to original value
   // eslint-disable-next-line node/no-process-env
@@ -137,19 +167,93 @@ const createHttpResponseResolver = (resolve: (response: HttpResponseType) => voi
   };
 };
 
-const createProxyServer = async (anyproxyRules?: any): Promise<ProxyServerType> => {
+// Create a local HTTPS server for CONNECT tunnel targets
+const createHttpsServer = async (): Promise<HttpsServerType> => {
   const port = await getNextPort();
+  const certs = await generateCertificates();
 
-  const localProxyServer: ProxyServerType = await new Promise((resolve) => {
-    const proxyServer = new ProxyServer({
-      port,
-      rule: {
-        ...anyproxyRules ? anyproxyRules : anyproxyDefaultRules,
-      },
+  const localHttpsServer: HttpsServerType = await new Promise((resolve) => {
+    const httpsServer = https.createServer({
+      cert: certs.cert,
+      key: certs.key,
+    }, (request, response) => {
+      response.writeHead(200, {'content-type': 'text/plain'});
+      response.end('OK');
     });
 
-    proxyServer.on('ready', () => {
+    httpsServer.listen(port, '127.0.0.1', () => {
       resolve({
+        port,
+        stop: () => {
+          httpsServer.close();
+        },
+        url: 'https://127.0.0.1:' + port,
+      });
+    });
+  });
+
+  localHttpsServers.push(localHttpsServer);
+
+  return localHttpsServer;
+};
+
+// Create a simple HTTP proxy server that can handle both HTTP requests and HTTPS CONNECT tunneling
+const createProxyServer = async (rules?: ProxyRules): Promise<ProxyServerType & {
+  httpsServer?: HttpsServerType,
+}> => {
+  const port = await getNextPort();
+
+  // Create an HTTPS server that the proxy will tunnel to for CONNECT requests
+  const httpsServer = await createHttpsServer();
+
+  const localProxyServer: ProxyServerType & {
+    httpsServer?: HttpsServerType,
+  } = await new Promise((resolve) => {
+    const proxyServer = http.createServer((request, response) => {
+      // Handle regular HTTP proxy requests
+      if (rules?.beforeSendRequest) {
+        const result = rules.beforeSendRequest({
+          requestOptions: {
+            headers: request.headers as Record<string, string>,
+          },
+        });
+
+        response.writeHead(result.response.statusCode, result.response.header);
+        response.end(result.response.body);
+      } else {
+        // Default response
+        response.writeHead(200, {'content-type': 'text/plain'});
+        response.end('OK');
+      }
+    });
+
+    // Handle CONNECT requests for HTTPS tunneling
+    proxyServer.on('connect', (request, clientSocket, head) => {
+      // Call onConnect hook if provided
+      if (rules?.onConnect) {
+        rules.onConnect(request);
+      }
+
+      // Connect to the local HTTPS server instead of the requested host
+      const serverSocket = net.connect(httpsServer.port, '127.0.0.1', () => {
+        clientSocket.write('HTTP/1.1 200 Connection Established\r\n\r\n');
+        serverSocket.write(head);
+        serverSocket.pipe(clientSocket);
+        clientSocket.pipe(serverSocket);
+      });
+
+      serverSocket.on('error', () => {
+        clientSocket.end('HTTP/1.1 500 Internal Server Error\r\n\r\n');
+      });
+
+      clientSocket.on('error', () => {
+        serverSocket.end();
+      });
+    });
+
+    proxyServer.listen(port, () => {
+      resolve({
+        httpsServer,
         port,
         stop: () => {
           proxyServer.close();
@@ -157,8 +261,6 @@ const createProxyServer = async (anyproxyRules?: any): Promise<ProxyServerType> 
         url: 'http://127.0.0.1:' + port,
       });
     });
-
-    proxyServer.start();
   });
 
   localProxyServers.push(localProxyServer);
@@ -206,7 +308,15 @@ serial('proxies HTTP request', async (t) => {
 serial('proxies HTTP request with proxy-authorization header', async (t) => {
   const globalProxyAgent = createGlobalProxyAgent();
 
-  const beforeSendRequest = sinon.stub().callsFake(anyproxyDefaultRules.beforeSendRequest);
+  const beforeSendRequest = stub().callsFake(() => {
+    return {
+      response: {
+        body: 'OK',
+        header: {'content-type': 'text/plain'},
+        statusCode: 200,
+      },
+    };
+  });
 
   const proxyServer = await createProxyServer({
     beforeSendRequest,
@@ -346,6 +456,8 @@ serial('Test addCACertificates and clearCACertificates methods', async (t) => {
 });
 
 serial('Test addCACertificates when passed ca is a string', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
@@ -357,13 +469,14 @@ serial('Test addCACertificates when passed ca is a string', async (t) => {
   globalAgent.addCACertificates('test-ca-certficate2');
   t.is(globalAgent.ca, 'test-ca-certficate1test-ca-certficate2');
   const response: HttpResponseType = await new Promise((resolve) => {
-    // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
-    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, servername: '127.0.0.1'}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
 });
 
 serial('Test addCACertificates when input ca is a string and existing ca is array', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const globalProxyAgent = createGlobalProxyAgent({ca: ['test-ca']});
 
   const proxyServer = await createProxyServer();
@@ -375,13 +488,14 @@ serial('Test addCACertificates when input ca is a string and existing ca is arra
   t.is(globalAgent.ca.length, 1);
   t.is(JSON.stringify(globalAgent.ca), JSON.stringify(['test-ca']));
   const response: HttpResponseType = await new Promise((resolve) => {
-    // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
-    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, servername: '127.0.0.1'}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
 });
 
 serial('Test addCACertificates when input ca array is null or undefined', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
@@ -393,13 +507,14 @@ serial('Test addCACertificates when input ca array is null or undefined', async 
   globalAgent.addCACertificates(null);
   t.is(globalAgent.ca, undefined);
   const response: HttpResponseType = await new Promise((resolve) => {
-    // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
-    https.get('https://127.0.0.1', {ca: ['test-ca'], secureEndpoint: true, servername: '127.0.0.1'}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
 });
 
 serial('Test initializing ca certificate property while creating global proxy agent', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const globalProxyAgent = createGlobalProxyAgent({ca: ['test-ca']});
 
   const proxyServer = await createProxyServer();
@@ -412,13 +527,14 @@ serial('Test initializing ca certificate property while creating global proxy ag
   t.is(globalAgent.ca[0], 'test-ca');
   t.is(globalAgent.ca[1], 'test-ca1');
   const response: HttpResponseType = await new Promise((resolve) => {
-    // @ts-expect-error seems 'secureEndpoint' property is not supported by RequestOptions but it should be.
-    https.get('https://127.0.0.1', {rejectUnauthorized: false, secureEndpoint: true}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
 });
 
 serial('proxies HTTPS request', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
@@ -426,33 +542,32 @@ serial('proxies HTTPS request', async (t) => {
   globalProxyAgent.HTTP_PROXY = proxyServer.url;
 
   const response: HttpResponseType = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
   });
 
   t.is(response.body, 'OK');
 });
 
 serial('proxies HTTPS request with proxy-authorization header', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const globalProxyAgent = createGlobalProxyAgent();
 
-  const beforeDealHttpsRequest = sinon.stub().callsFake(async () => {
-    return true;
-  });
+  const onConnect = stub();
 
   const proxyServer = await createProxyServer({
-    beforeDealHttpsRequest,
-    beforeSendRequest: anyproxyDefaultRules.beforeSendRequest,
+    onConnect,
   });
 
   globalProxyAgent.HTTP_PROXY = 'http://foo@127.0.0.1:' + proxyServer.port;
 
   const response: HttpResponseType = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
   });
 
   t.is(response.body, 'OK');
 
-  t.is(beforeDealHttpsRequest.firstCall.args[0]._req.headers['proxy-authorization'], 'Basic Zm9v');
+  t.is(onConnect.firstCall.args[0].headers['proxy-authorization'], 'Basic Zm9v');
 });
 
 serial('does not produce unhandled rejection when cannot connect to proxy', async (t) => {
@@ -466,6 +581,8 @@ serial('does not produce unhandled rejection when cannot connect to proxy', asyn
 });
 
 serial('proxies HTTPS request with dedicated proxy', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
@@ -473,7 +590,7 @@ serial('proxies HTTPS request with dedicated proxy', async (t) => {
   globalProxyAgent.HTTPS_PROXY = proxyServer.url;
 
   const response: HttpResponseType = await new Promise((resolve) => {
-    https.get('https://127.0.0.1', {}, createHttpResponseResolver(resolve));
+    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
   });
 
   t.is(response.body, 'OK');
@@ -516,10 +633,10 @@ serial('forwards requests that go to a socket', async (t) => {
   // not relevant as traffic shouldn't go through proxy
   globalProxyAgent.HTTP_PROXY = 'localhost:10324';
 
-  var server = http.createServer(function (req, res) {
-    res.writeHead(200);
-    res.write('OK');
-    res.end();
+  const server = http.createServer((request, serverResponse) => {
+    serverResponse.writeHead(200);
+    serverResponse.write('OK');
+    serverResponse.end();
   });
 
   t.teardown(() => {
@@ -529,10 +646,9 @@ serial('forwards requests that go to a socket', async (t) => {
 
   const response: HttpResponseType = await new Promise((resolve) => {
     http.get({
-        socketPath: '/tmp/test.sock',
-        path: '/endpoint',
-      }, createHttpResponseResolver(resolve)
-    );
+      path: '/endpoint',
+      socketPath: '/tmp/test.sock',
+    }, createHttpResponseResolver(resolve));
   });
   t.is(response.body, 'OK');
 });
@@ -566,6 +682,8 @@ serial('proxies HTTP request (using got)', async (t) => {
 });
 
 serial('proxies HTTPS request (using got)', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
@@ -590,6 +708,8 @@ serial('proxies HTTP request (using axios)', async (t) => {
 });
 
 serial('proxies HTTPS request (using axios)', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();
@@ -620,6 +740,8 @@ serial('proxies HTTP request (using request)', async (t) => {
 });
 
 serial('proxies HTTPS request (using request)', async (t) => {
+  // eslint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const globalProxyAgent = createGlobalProxyAgent();
 
   const proxyServer = await createProxyServer();

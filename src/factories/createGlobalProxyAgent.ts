@@ -1,9 +1,6 @@
 import http from 'http';
 import https from 'https';
 import {
-  parseBoolean,
-} from '../utilities/parseBoolean';
-import {
   omitUndefined,
 } from 'omit-undefined';
 import semverGte from 'semver/functions/gte';
@@ -24,6 +21,9 @@ import {
   isUrlMatchingNoProxy,
   parseProxyUrl,
 } from '../utilities';
+import {
+  parseBoolean,
+} from '../utilities/parseBoolean';
 import createProxyController from './createProxyController';
 
 const httpGet = http.get;

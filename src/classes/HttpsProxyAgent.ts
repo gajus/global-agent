@@ -49,10 +49,11 @@ class HttpsProxyAgent extends Agent {
 
       const statusCode = statusLineExp.exec(statusLine)?.[3];
 
-      if (typeof statusCode === 'string' && +statusCode >= 400) {
-        const err = new Error(`Proxy server refused connecting to '${configuration.host}:${configuration.port}' (${statusLine})`);
-        callback(err);
+      if (typeof statusCode === 'string' && Number(statusCode) >= 400) {
+        const error = new Error(`Proxy server refused connecting to '${configuration.host}:${configuration.port}' (${statusLine})`);
         socket.destroy();
+        callback(error);
+
         return;
       }
 
