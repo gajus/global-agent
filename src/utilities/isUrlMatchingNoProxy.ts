@@ -6,7 +6,7 @@ import {
 export default (subjectUrl: string, noProxy: string) => {
   const subjectUrlTokens = new URL(subjectUrl);
 
-  const rules = noProxy.split(/[\s,]+/);
+  const rules = noProxy.split(/[\s,]+/).filter(Boolean);
 
   for (const rule of rules) {
     const ruleMatch = rule

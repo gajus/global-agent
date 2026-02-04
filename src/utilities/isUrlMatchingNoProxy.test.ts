@@ -63,3 +63,15 @@ test('returns `true` if hosts match in one of multiple rules separated with a co
 test('returns `true` if hosts match in one of multiple rules separated with a space', () => {
   expect(isUrlMatchingNoProxy('http://foo.com/', 'bar.org foo.com baz.io')).toBe(true);
 });
+
+test('handles trailing newline in NO_PROXY', () => {
+  expect(isUrlMatchingNoProxy('http://foo.com/', 'foo.com\n')).toBe(true);
+});
+
+test('handles trailing whitespace in NO_PROXY', () => {
+  expect(isUrlMatchingNoProxy('http://foo.com/', 'foo.com   ')).toBe(true);
+});
+
+test('handles leading whitespace in NO_PROXY', () => {
+  expect(isUrlMatchingNoProxy('http://foo.com/', '  foo.com')).toBe(true);
+});
