@@ -82,6 +82,19 @@ abstract class Agent {
       requestUrl = this.protocol + '//' + (configuration.hostname ?? configuration.host) + (configuration.port === 80 ?? configuration.port === 443 ? '' : ':' + configuration.port) + request.path;
     }
 
+    // If a request should go to a local socket, proxying it through an HTTP
+    // server does not make sense as the information about the target socket
+    // will be lost and the proxy won't be able to correctly handle the request.
+    if (configuration.socketPath) {
+      log.trace({
+        destination: configuration.socketPath,
+      }, "not proxying request; destination is a socket");
+
+      // @ts-expect-error seems like we are using wrong type for fallbackAgent.
+      this.fallbackAgent.addRequest(request, configuration);
+      return;
+    }
+
     if (!this.isProxyConfigured()) {
       log.trace({
         destination: requestUrl,
