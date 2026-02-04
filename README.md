@@ -166,11 +166,13 @@ Use [`roarr-cli`](https://github.com/gajus/roarr-cli) program to pretty-print th
  * @property environmentVariableNamespace Defines namespace of `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables. (Default: `GLOBAL_AGENT_`)
  * @property forceGlobalAgent Forces to use `global-agent` HTTP(S) agent even when request was explicitly constructed with another agent. (Default: `true`)
  * @property socketConnectionTimeout Destroys socket if connection is not established within the timeout. (Default: `60000`)
+ * @property ca Single CA certificate or an array of CA certificates that is trusted for secure connections to the registry.
  */
 type ProxyAgentConfigurationInputType = {|
   +environmentVariableNamespace?: string,
   +forceGlobalAgent?: boolean,
   +socketConnectionTimeout?: number,
+  +ca?: string[] | string,
 |};
 
 (configurationInput: ProxyAgentConfigurationInputType) => ProxyAgentConfigurationType;
@@ -199,6 +201,65 @@ type ProxyAgentConfigurationInputType = {|
 |`HTTP_PROXY`|Yes|Sets HTTP proxy to use.|
 |`HTTPS_PROXY`|Yes|Sets a distinct proxy to use for HTTPS requests.|
 |`NO_PROXY`|Yes|Specifies a pattern of URLs that should be excluded from proxying. See [Exclude URLs](#exclude-urls).|
+
+## Certificate Authority (CA)
+
+### `addCACertificates`
+This method can be accessed using https to add CA certificates to the global-agent.
+
+Uses:
+```js
+if (typeof https.globalAgent.addCACertificates === 'function') {
+  //certificate - an array of ca certificates to be added to the global-agent
+  https.globalAgent.addCACertificates(certificate);
+}
+```
+
+Method Definition:
+```js
+/**
+ * This method can be used to append new ca certificates to existing ca certificates
+ * @param {string[] | string} ca a ca certificate or an array of ca certificates
+ */
+public addCACertificates (ca: string[] | string) {
+  if (!ca) {
+    log.error('Invalid input ca certificate');
+  } else if (this.ca) {
+    if (typeof ca === typeof this.ca) {
+      // concat valid ca certificates with the existing certificates,
+      if (typeof this.ca === 'string') {
+        this.ca = this.ca.concat(ca as string);
+      } else {
+        this.ca = this.ca.concat(ca as string[]);
+      }
+    } else {
+      log.error('Input ca certificate type mismatched with existing ca certificate type');
+    }
+  } else {
+    this.ca = ca;
+  }
+}
+```
+
+### `clearCACertificates`
+This method can be accessed using https to clear existing CA certificates from global-agent.
+
+Uses:
+```js
+if (typeof https.globalAgent.clearCACertificates === 'function') {
+  https.globalAgent.clearCACertificates();
+}
+```
+Method Definition:
+```js
+/**
+ * This method clears existing CA Certificates.
+ * It sets ca to undefined
+ */
+public clearCACertificates () {
+  this.ca = undefined;
+}
+```
 
 ## Supported libraries
 
