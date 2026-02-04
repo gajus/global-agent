@@ -1,8 +1,5 @@
 import http from 'http';
 import https from 'https';
-import {
-  omitUndefined,
-} from 'omit-undefined';
 import semverGte from 'semver/functions/gte';
 import {
   logger,
@@ -56,7 +53,7 @@ const createConfiguration = (configurationInput: ProxyAgentConfigurationInputTyp
 
   return {
     ...defaultConfiguration,
-    ...omitUndefined(configurationInput),
+    ...Object.fromEntries(Object.entries(configurationInput).filter(([, v]) => v !== undefined)),
   };
 };
 
