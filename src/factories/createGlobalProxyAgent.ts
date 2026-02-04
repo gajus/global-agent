@@ -45,7 +45,7 @@ const defaultConfigurationInput = {
 };
 
 const createConfiguration = (configurationInput: ProxyAgentConfigurationInputType): ProxyAgentConfigurationType => {
-  // eslint-disable-next-line node/no-process-env
+  // oxlint-disable-next-line node/no-process-env
   const environment = process.env;
 
   const defaultConfiguration = {
@@ -69,13 +69,13 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
 
   const proxyController = createProxyController();
 
-  // eslint-disable-next-line node/no-process-env
+  // oxlint-disable-next-line node/no-process-env
   proxyController.HTTP_PROXY = process.env[configuration.environmentVariableNamespace + 'HTTP_PROXY'] ?? null;
 
-  // eslint-disable-next-line node/no-process-env
+  // oxlint-disable-next-line node/no-process-env
   proxyController.HTTPS_PROXY = process.env[configuration.environmentVariableNamespace + 'HTTPS_PROXY'] ?? null;
 
-  // eslint-disable-next-line node/no-process-env
+  // oxlint-disable-next-line node/no-process-env
   proxyController.NO_PROXY = process.env[configuration.environmentVariableNamespace + 'NO_PROXY'] ?? null;
 
   log.info({

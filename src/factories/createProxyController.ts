@@ -19,7 +19,7 @@ const KNOWN_PROPERTY_NAMES = [
 ];
 
 export default (): ProxyController => {
-  // eslint-disable-next-line fp/no-proxy
+  // oxlint-disable-next-line fp/no-proxy
   return new Proxy({
     HTTP_PROXY: null,
     HTTPS_PROXY: null,

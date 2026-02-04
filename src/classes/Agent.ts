@@ -108,7 +108,7 @@ abstract class Agent {
    * Evaluate value for tls reject unauthorized variable
    */
   public getRejectUnauthorized () {
-    // eslint-disable-next-line node/no-process-env
+    // oxlint-disable-next-line node/no-process-env
     const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
     let returnValue = true;
     if (typeof rejectUnauthorized === 'boolean') {

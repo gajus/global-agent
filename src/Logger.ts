@@ -9,7 +9,7 @@ export type Logger = {
   warn: LogMethod,
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
+// oxlint-disable-next-line @typescript-eslint/no-empty-function
 const noop = () => {};
 
 const createNoopLogger = (): Logger => {
