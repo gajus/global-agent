@@ -6,7 +6,7 @@ import {
 import {
   omitUndefined,
 } from 'omit-undefined';
-import semver from 'semver';
+import semverGte from 'semver/functions/gte';
 import Logger from '../Logger';
 import {
   HttpProxyAgent,
@@ -144,7 +144,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
 
   // Overriding globalAgent was added in v11.7.
   // @see https://nodejs.org/uk/blog/release/v11.7.0/
-  if (semver.gte(process.version, 'v11.7.0')) {
+  if (semverGte(process.version, 'v11.7.0')) {
     // @see https://github.com/facebook/flow/issues/7670
     // @ts-expect-error Node.js version compatibility
     http.globalAgent = httpAgent;
@@ -161,7 +161,7 @@ export default (configurationInput: ProxyAgentConfigurationInputType = defaultCo
   //
   // We still want to override http(s).globalAgent when possible to enable logic
   // in `bindHttpMethod`.
-  if (semver.gte(process.version, 'v10.0.0')) {
+  if (semverGte(process.version, 'v10.0.0')) {
     // @ts-expect-error seems like we are using wrong type for httpAgent
     http.get = bindHttpMethod(httpGet, httpAgent, configuration.forceGlobalAgent);
 
