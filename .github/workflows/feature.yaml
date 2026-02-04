@@ -1,0 +1,32 @@
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: setup npm
+        uses: npm/action-setup@v4
+        with:
+          version: 10
+      - run: npm install
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+    timeout-minutes: 10
+name: Test
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
