@@ -1,6 +1,4 @@
-import ExtendableError from 'es6-error';
-
-export class UnexpectedStateError extends ExtendableError {
+export class UnexpectedStateError extends Error {
   public code: string;
 
   public constructor (message: string, code: string = 'UNEXPECTED_STATE_ERROR') {

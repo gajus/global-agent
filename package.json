@@ -5,8 +5,7 @@
     "url": "https://gajus.com"
   },
   "dependencies": {
-    "es6-error": "^4.1.1",
-    "globalthis": "^1.0.2",
+        "globalthis": "^1.0.2",
     "matcher": "^4.0.0",
     "omit-undefined": "^1.0.1",
     "semver": "^7.3.5",
