@@ -1,8 +1,8 @@
 import http from 'http';
 import https from 'https';
 import {
-  boolean as parseBoolean,
-} from 'boolean';
+  parseBoolean,
+} from '../utilities/parseBoolean';
 import {
   omitUndefined,
 } from 'omit-undefined';
