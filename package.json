@@ -78,7 +78,7 @@
     "agent"
   ],
   "license": "BSD-3-Clause",
-  "main": "./dist/index.js",
+  "main": "./dist/src/index.js",
   "name": "global-agent",
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript",
