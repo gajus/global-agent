@@ -5,9 +5,9 @@
     "url": "https://gajus.com"
   },
   "dependencies": {
-        "globalthis": "^1.0.2",
+    "globalthis": "^1.0.2",
     "matcher": "^4.0.0",
-        "semver": "^7.3.5",
+    "semver": "^7.3.5",
     "serialize-error": "^8.1.0"
   },
   "description": "Global HTTP/HTTPS proxy configurable using environment variables.",
@@ -66,7 +66,8 @@
     "build": "del-cli ./dist && tsc",
     "lint": "oxlint ./src && tsc",
     "test": "vitest run",
-    "create-readme": "gitdown ./.README/README.md --output-file ./README.md"
+    "create-readme": "gitdown ./.README/README.md --output-file ./README.md",
+    "prepublishOnly": "npm run build"
   },
   "typings": "./dist/src/index.d.ts",
   "version": "0.0.0-development"
