@@ -71,6 +71,5 @@
     "test": "vitest run",
     "create-readme": "gitdown ./.README/README.md --output-file ./README.md"
   },
-  "typings": "./dist/src/index.d.ts",
   "version": "0.0.0-development"
 }
