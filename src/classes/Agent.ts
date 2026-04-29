@@ -223,8 +223,10 @@ abstract class Agent {
     // > are also accepted:
     // >   ca, cert, ciphers, clientCertEngine, crl, dhparam, ecdhCurve, honorCipherOrder,
     // >   key, passphrase, pfx, rejectUnauthorized, secureOptions, secureProtocol, servername, sessionIdContext.
-    if (configuration.secureEndpoint) {
-      // Determine servername - Node.js doesn't allow IP addresses as servername
+    // Use `this.protocol` instead of `configuration.secureEndpoint` to determine
+    // if TLS options are needed. Many HTTP clients (got@11, etc.) don't set
+    // `secureEndpoint`, causing TLS connections to omit servername (SNI).
+    if (this.protocol === 'https:' || configuration.secureEndpoint) {
       const host = configuration.servername ?? connectionConfiguration.host;
       const servername = net.isIP(host) ? undefined : host;
 
