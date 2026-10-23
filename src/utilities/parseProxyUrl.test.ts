@@ -16,6 +16,10 @@ test('extracts authorization', () => {
   expect(parseProxyUrl('http://foo:bar@0.0.0.0').authorization).toBe('foo:bar');
 });
 
+test('extracts literal IPv6 address', () => {
+  expect(parseProxyUrl('http://[2001:db8::1]:3000').hostname).toBe('2001:db8::1');
+});
+
 test('throws an error if protocol is not "http:"', () => {
   expect(() => {
     parseProxyUrl('https://0.0.0.0:3000');

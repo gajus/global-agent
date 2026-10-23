@@ -1,3 +1,4 @@
+import net from 'net';
 import {
   UnexpectedStateError,
 } from '../errors';
@@ -17,6 +18,15 @@ export default (url: string) => {
     throw new UnexpectedStateError('Unsupported `GLOBAL_AGENT.HTTP_PROXY` configuration value: URL protocol must be "http:".');
   }
 
+  let hostname = urlTokens.hostname;
+
+  if (hostname.startsWith('[') && hostname.endsWith(']')) {
+    let unwrappedHostname = hostname.slice(1, -1);
+    if (net.isIPv6(unwrappedHostname)) {
+      hostname = unwrappedHostname;
+    }
+  }
+
   let port = 80;
 
   if (urlTokens.port) {
@@ -33,7 +43,7 @@ export default (url: string) => {
 
   return {
     authorization,
-    hostname: urlTokens.hostname,
+    hostname: hostname,
     port,
   };
 };
