@@ -47,6 +47,7 @@ type ProxyRules = {
     requestOptions: {
       headers: Record<string, string>,
     },
+    url: string,
   }) => {
     response: {
       body: string,
@@ -223,6 +224,7 @@ const createProxyServer = async (rules?: ProxyRules): Promise<ProxyServerType & 
           requestOptions: {
             headers: request.headers as Record<string, string>,
           },
+          url: request.url as string,
         });
 
         response.writeHead(result.response.statusCode, result.response.header);
@@ -338,6 +340,39 @@ test('proxies HTTP request with proxy-authorization header', async () => {
   expect(response.body).toBe('OK');
 
   expect(beforeSendRequest.firstCall.args[0].requestOptions.headers['proxy-authorization']).toBe('Basic Zm9v');
+});
+
+test('proxies HTTP request that already uses an absolute https:// path', async () => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const beforeSendRequest = stub().callsFake(() => {
+    return {
+      response: {
+        body: 'OK',
+        header: {'content-type': 'text/plain'},
+        statusCode: 200,
+      },
+    };
+  });
+
+  const proxyServer = await createProxyServer({
+    beforeSendRequest,
+  });
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  // e.g. axios handling HTTPS_PROXY itself sends https:// requests in absolute-form over plain HTTP
+  const response: HttpResponseType = await new Promise((resolve) => {
+    http.get({
+      host: '127.0.0.1',
+      path: 'https://example.org/',
+      port: 8_000,
+    }, createHttpResponseResolver(resolve));
+  });
+
+  expect(response.body).toBe('OK');
+
+  expect(beforeSendRequest.firstCall.args[0].url).toBe('https://example.org/');
 });
 
 test('Test reject unauthorized variable when NODE_TLS_REJECT_UNAUTHORIZED = undefined', async () => {
