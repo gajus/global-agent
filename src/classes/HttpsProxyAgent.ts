@@ -59,6 +59,8 @@ class HttpsProxyAgent extends Agent {
 
       const secureSocket = tls.connect({
         ...configuration.tls,
+        // Used to verify the server identity when servername is omitted (e.g. IP address).
+        host: configuration.host,
         socket,
       });
 

@@ -29,15 +29,8 @@ type AgentRequestOptions = {
   port: number,
 };
 
-type HttpRequestOptions = AgentRequestOptions & Omit<http.RequestOptions, keyof AgentRequestOptions> & {
-  secureEndpoint: false,
-};
-
-type HttpsRequestOptions = AgentRequestOptions & Omit<https.RequestOptions, keyof AgentRequestOptions> & {
-  secureEndpoint: true,
-};
-
-type RequestOptions = HttpRequestOptions | HttpsRequestOptions;
+// `https.RequestOptions` is a superset of `http.RequestOptions`.
+type RequestOptions = AgentRequestOptions & Omit<https.RequestOptions, keyof AgentRequestOptions>;
 
 abstract class Agent {
   public defaultPort: number;
@@ -223,7 +216,9 @@ abstract class Agent {
     // > are also accepted:
     // >   ca, cert, ciphers, clientCertEngine, crl, dhparam, ecdhCurve, honorCipherOrder,
     // >   key, passphrase, pfx, rejectUnauthorized, secureOptions, secureProtocol, servername, sessionIdContext.
-    if (configuration.secureEndpoint) {
+    //
+    // Do not check `configuration.secureEndpoint`: it is an agent-base convention that Node.js never sets.
+    if (this.protocol === 'https:') {
       // Determine servername - Node.js doesn't allow IP addresses as servername
       const host = configuration.servername ?? connectionConfiguration.host;
       const servername = net.isIP(host) ? undefined : host;

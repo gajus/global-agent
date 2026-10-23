@@ -5,6 +5,9 @@ import type {
 import http from 'http';
 import https from 'https';
 import net from 'net';
+import type {
+  TLSSocket,
+} from 'tls';
 import {
   afterEach,
   beforeAll,
@@ -89,7 +92,7 @@ const generateCertificates = (): Promise<{
       return;
     }
 
-    pem.createCertificate({days: 1, selfSigned: true}, (error, keys) => {
+    pem.createCertificate({altNames: ['example.test', '127.0.0.1'], commonName: 'example.test', days: 1, selfSigned: true}, (error, keys) => {
       if (error) {
         reject(error);
 
@@ -178,7 +181,10 @@ const createHttpsServer = async (): Promise<HttpsServerType> => {
       cert: certs.cert,
       key: certs.key,
     }, (request, response) => {
-      response.writeHead(200, {'content-type': 'text/plain'});
+      response.writeHead(200, {
+        'content-type': 'text/plain',
+        'x-servername': String((request.socket as TLSSocket).servername),
+      });
       response.end('OK');
     });
 
@@ -595,6 +601,55 @@ test('proxies HTTPS request with dedicated proxy', async () => {
   });
 
   expect(response.body).toBe('OK');
+});
+
+test('proxies HTTPS request with SNI and verifies the server certificate', async () => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const certs = await generateCertificates();
+
+  const response: HttpResponseType = await new Promise((resolve, reject) => {
+    https.get('https://example.test', {ca: certs.cert}, createHttpResponseResolver(resolve)).on('error', reject);
+  });
+
+  expect(response.body).toBe('OK');
+  expect(response.headers['x-servername']).toBe('example.test');
+});
+
+test('proxies HTTPS request to an IP address and verifies the server certificate', async () => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const certs = await generateCertificates();
+
+  const response: HttpResponseType = await new Promise((resolve, reject) => {
+    https.get('https://127.0.0.1', {ca: certs.cert}, createHttpResponseResolver(resolve)).on('error', reject);
+  });
+
+  expect(response.body).toBe('OK');
+});
+
+test('rejects proxied HTTPS request when the server certificate does not match the host', async () => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const certs = await generateCertificates();
+
+  await expect(new Promise((resolve, reject) => {
+    https.get('https://example.org', {ca: certs.cert}, createHttpResponseResolver(resolve)).on('error', reject);
+  })).rejects.toMatchObject({
+    code: 'ERR_TLS_CERT_ALTNAME_INVALID',
+  });
 });
 
 test('ignores dedicated HTTPS proxy for HTTP urls', async () => {
