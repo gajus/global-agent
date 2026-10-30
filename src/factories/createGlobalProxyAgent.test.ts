@@ -6,6 +6,9 @@ import http from 'http';
 import https from 'https';
 import net from 'net';
 import type {
+  Duplex,
+} from 'stream';
+import type {
   TLSSocket,
 } from 'tls';
 import {
@@ -56,6 +59,8 @@ type ProxyRules = {
     },
   },
   onConnect?: (request: http.IncomingMessage) => void,
+  // Replaces the default CONNECT response. openTunnel() connects to the HTTPS server, writes `connectResponse`, then pipes both ends.
+  writeConnectResponse?: (clientSocket: Duplex, openTunnel: (connectResponse: string) => void) => void,
 };
 
 const defaultHttpAgent = http.globalAgent;
@@ -182,11 +187,20 @@ const createHttpsServer = async (): Promise<HttpsServerType> => {
       cert: certs.cert,
       key: certs.key,
     }, (request, response) => {
-      response.writeHead(200, {
-        'content-type': 'text/plain',
-        'x-servername': String((request.socket as TLSSocket).servername),
-      });
-      response.end('OK');
+      const respond = () => {
+        response.writeHead(200, {
+          'content-type': 'text/plain',
+          'x-servername': String((request.socket as TLSSocket).servername),
+        });
+        response.end('OK');
+      };
+
+      // Responds after the 300 ms socketConnectionTimeout of the idle-tunnel test.
+      if (request.url === '/slow') {
+        setTimeout(respond, 1_000);
+      } else {
+        respond();
+      }
     });
 
     httpsServer.listen(port, '127.0.0.1', () => {
@@ -243,21 +257,33 @@ const createProxyServer = async (rules?: ProxyRules): Promise<ProxyServerType & 
         rules.onConnect(request);
       }
 
-      // Connect to the local HTTPS server instead of the requested host
-      const serverSocket = net.connect(httpsServer.port, '127.0.0.1', () => {
-        clientSocket.write('HTTP/1.1 200 Connection Established\r\n\r\n');
-        serverSocket.write(head);
-        serverSocket.pipe(clientSocket);
-        clientSocket.pipe(serverSocket);
-      });
+      let serverSocket: net.Socket | undefined;
 
-      serverSocket.on('error', () => {
-        clientSocket.end('HTTP/1.1 500 Internal Server Error\r\n\r\n');
-      });
+      // Connect to the local HTTPS server instead of the requested host
+      const openTunnel = (connectResponse: string) => {
+        const socket = net.connect(httpsServer.port, '127.0.0.1', () => {
+          clientSocket.write(connectResponse);
+          socket.write(head);
+          socket.pipe(clientSocket);
+          clientSocket.pipe(socket);
+        });
+
+        socket.on('error', () => {
+          clientSocket.end('HTTP/1.1 500 Internal Server Error\r\n\r\n');
+        });
+
+        serverSocket = socket;
+      };
 
       clientSocket.on('error', () => {
-        serverSocket.end();
+        serverSocket?.end();
       });
+
+      if (rules?.writeConnectResponse) {
+        rules.writeConnectResponse(clientSocket, openTunnel);
+      } else {
+        openTunnel('HTTP/1.1 200 Connection Established\r\n\r\n');
+      }
     });
 
     proxyServer.listen(port, () => {
@@ -685,6 +711,179 @@ test('rejects proxied HTTPS request when the server certificate does not match t
   })).rejects.toMatchObject({
     code: 'ERR_TLS_CERT_ALTNAME_INVALID',
   });
+});
+
+test('proxies HTTPS request when the proxy writes the CONNECT response in several chunks', async () => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer({
+    writeConnectResponse: (clientSocket, openTunnel) => {
+      clientSocket.write('HTTP/1.1 200 Connection Established\r\n');
+
+      setTimeout(() => {
+        openTunnel('Proxy-Agent: test\r\n\r\n');
+      }, 50);
+    },
+  });
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const certs = await generateCertificates();
+
+  const response: HttpResponseType = await new Promise((resolve, reject) => {
+    https.get('https://example.test', {ca: certs.cert}, createHttpResponseResolver(resolve)).on('error', reject);
+  });
+
+  expect(response.body).toBe('OK');
+});
+
+test('rejects proxied HTTPS request when the proxy refuses the CONNECT request, whatever its line endings', async () => {
+  for (const lineEnding of ['\r\n', '\n']) {
+    const globalProxyAgent = createGlobalProxyAgent();
+
+    const proxyServer = await createProxyServer({
+      writeConnectResponse: (clientSocket) => {
+        clientSocket.end('HTTP/1.1 403 Forbidden' + lineEnding + 'Content-Length: 0' + lineEnding + lineEnding);
+      },
+    });
+
+    globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+    await expect(new Promise((resolve, reject) => {
+      https.get('https://example.test', createHttpResponseResolver(resolve)).on('error', reject);
+    })).rejects.toThrow('Proxy server refused connecting to \'example.test:443\' (HTTP/1.1 403 Forbidden)');
+  }
+});
+
+test('rejects proxied HTTPS request when the proxy closes the connection before the end of the CONNECT response', async () => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer({
+    writeConnectResponse: (clientSocket) => {
+      clientSocket.end('HTTP/1.1 200 Connection Established\r\n');
+    },
+  });
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  await expect(new Promise((resolve, reject) => {
+    https.get('https://example.test', createHttpResponseResolver(resolve)).on('error', reject);
+  })).rejects.toMatchObject({
+    code: 'ECONNRESET',
+    message: 'Proxy server closed the connection before answering CONNECT to \'example.test:443\'',
+  });
+});
+
+test('proxies HTTPS request when the proxy ends the CONNECT response lines with a bare LF', async () => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer({
+    writeConnectResponse: (clientSocket, openTunnel) => {
+      openTunnel('HTTP/1.1 200 Connection Established\n\n');
+    },
+  });
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const certs = await generateCertificates();
+
+  const response: HttpResponseType = await new Promise((resolve, reject) => {
+    https.get('https://example.test', {ca: certs.cert}, createHttpResponseResolver(resolve)).on('error', reject);
+  });
+
+  expect(response.body).toBe('OK');
+});
+
+test('rejects proxied HTTPS request when the proxy does not complete the CONNECT response within socketConnectionTimeout', async () => {
+  const globalProxyAgent = createGlobalProxyAgent({
+    socketConnectionTimeout: 300,
+  });
+
+  const proxyServer = await createProxyServer({
+    writeConnectResponse: (clientSocket) => {
+      clientSocket.write('HTTP/1.1 200 Connection Established\r\n');
+
+      // Keeps the connection busy without ever ending the headers.
+      const interval = setInterval(() => {
+        clientSocket.write('X');
+      }, 100);
+
+      clientSocket.on('close', () => {
+        clearInterval(interval);
+      });
+    },
+  });
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  await expect(new Promise((resolve, reject) => {
+    https.get('https://example.test', createHttpResponseResolver(resolve)).on('error', reject);
+  })).rejects.toMatchObject({
+    code: 'ETIMEDOUT',
+    message: 'Proxy server did not establish the tunnel to \'example.test:443\' in time',
+  });
+});
+
+test('rejects proxied HTTPS request when the CONNECT response headers exceed http.maxHeaderSize', async () => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const proxyServer = await createProxyServer({
+    writeConnectResponse: (clientSocket) => {
+      // 3-byte characters: over the limit in bytes, under it in characters.
+      clientSocket.write('HTTP/1.1 200 Connection Established\r\nX-Filler: ' + '€'.repeat(http.maxHeaderSize / 2) + '\r\n');
+    },
+  });
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  await expect(new Promise((resolve, reject) => {
+    https.get('https://example.test', createHttpResponseResolver(resolve)).on('error', reject);
+  })).rejects.toThrow('Proxy server answered CONNECT to \'example.test:443\' with headers larger than ' + http.maxHeaderSize + ' bytes');
+});
+
+test('keeps the tunnel open for longer than socketConnectionTimeout once the CONNECT response is complete', async () => {
+  const globalProxyAgent = createGlobalProxyAgent({
+    socketConnectionTimeout: 300,
+  });
+
+  const proxyServer = await createProxyServer();
+
+  globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+  const certs = await generateCertificates();
+
+  const response: HttpResponseType = await new Promise((resolve, reject) => {
+    https.get('https://example.test/slow', {ca: certs.cert}, createHttpResponseResolver(resolve)).on('error', reject);
+  });
+
+  expect(response.body).toBe('OK');
+});
+
+test('proxies HTTPS request when socketConnectionTimeout is 0 or above the setTimeout() limit', async () => {
+  const certs = await generateCertificates();
+
+  for (const socketConnectionTimeout of [0, 2 ** 31]) {
+    const globalProxyAgent = createGlobalProxyAgent({
+      socketConnectionTimeout,
+    });
+
+    // Answers late enough that a timer firing almost immediately would win.
+    const proxyServer = await createProxyServer({
+      writeConnectResponse: (clientSocket, openTunnel) => {
+        setTimeout(() => {
+          openTunnel('HTTP/1.1 200 Connection Established\r\n\r\n');
+        }, 50);
+      },
+    });
+
+    globalProxyAgent.HTTP_PROXY = proxyServer.url;
+
+    const response: HttpResponseType = await new Promise((resolve, reject) => {
+      https.get('https://example.test', {ca: certs.cert}, createHttpResponseResolver(resolve)).on('error', reject);
+    });
+
+    expect(response.body).toBe('OK');
+  }
 });
 
 test('ignores dedicated HTTPS proxy for HTTP urls', async () => {
