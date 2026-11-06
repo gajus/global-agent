@@ -645,7 +645,7 @@ test('does not produce unhandled rejection when cannot connect to proxy', async 
 
   globalProxyAgent.HTTP_PROXY = 'http://127.0.0.1:' + port;
 
-  await expect(got('http://127.0.0.1')).rejects.toThrow();
+  await expect(got('http://127.0.0.1', {retry: 0})).rejects.toThrow();
 });
 
 test('proxies HTTPS request with dedicated proxy', async () => {
