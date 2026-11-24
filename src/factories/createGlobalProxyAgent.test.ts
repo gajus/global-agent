@@ -368,6 +368,34 @@ test('proxies HTTP request with proxy-authorization header', async () => {
   expect(beforeSendRequest.firstCall.args[0].requestOptions.headers['proxy-authorization']).toBe('Basic Zm9v');
 });
 
+test('proxies HTTP request with decoded percent-encoded proxy-authorization credentials', async () => {
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const beforeSendRequest = stub().callsFake(() => {
+    return {
+      response: {
+        body: 'OK',
+        header: {'content-type': 'text/plain'},
+        statusCode: 200,
+      },
+    };
+  });
+
+  const proxyServer = await createProxyServer({
+    beforeSendRequest,
+  });
+
+  globalProxyAgent.HTTP_PROXY = 'http://me%40corp:p%3Ass@127.0.0.1:' + proxyServer.port;
+
+  const response: HttpResponseType = await new Promise((resolve) => {
+    http.get('http://127.0.0.1', createHttpResponseResolver(resolve));
+  });
+
+  expect(response.body).toBe('OK');
+
+  expect(beforeSendRequest.firstCall.args[0].requestOptions.headers['proxy-authorization']).toBe('Basic ' + Buffer.from('me@corp:p:ss').toString('base64'));
+});
+
 test('proxies HTTP request that already uses an absolute https:// path', async () => {
   const globalProxyAgent = createGlobalProxyAgent();
 
@@ -636,6 +664,28 @@ test('proxies HTTPS request with proxy-authorization header', async () => {
   expect(response.body).toBe('OK');
 
   expect(onConnect.firstCall.args[0].headers['proxy-authorization']).toBe('Basic Zm9v');
+});
+
+test('proxies HTTPS request with decoded percent-encoded proxy-authorization credentials', async () => {
+  // oxlint-disable-next-line node/no-process-env
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  const globalProxyAgent = createGlobalProxyAgent();
+
+  const onConnect = stub();
+
+  const proxyServer = await createProxyServer({
+    onConnect,
+  });
+
+  globalProxyAgent.HTTP_PROXY = 'http://me%40corp:p%3Ass@127.0.0.1:' + proxyServer.port;
+
+  const response: HttpResponseType = await new Promise((resolve) => {
+    https.get('https://127.0.0.1', createHttpResponseResolver(resolve));
+  });
+
+  expect(response.body).toBe('OK');
+
+  expect(onConnect.firstCall.args[0].headers['proxy-authorization']).toBe('Basic ' + Buffer.from('me@corp:p:ss').toString('base64'));
 });
 
 test('does not produce unhandled rejection when cannot connect to proxy', async () => {

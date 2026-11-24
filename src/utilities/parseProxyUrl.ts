@@ -3,6 +3,16 @@ import {
   UnexpectedStateError,
 } from '../errors';
 
+// URL#username and URL#password are percent-encoded; the proxy expects the raw values.
+// Keep the raw value when it is not a valid percent-encoded string (e.g. "%zz").
+const decodeCredential = (value: string): string => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 export default (url: string) => {
   const urlTokens = new URL(url);
 
@@ -36,9 +46,9 @@ export default (url: string) => {
   let authorization = null;
 
   if (urlTokens.username && urlTokens.password) {
-    authorization = urlTokens.username + ':' + urlTokens.password;
+    authorization = decodeCredential(urlTokens.username) + ':' + decodeCredential(urlTokens.password);
   } else if (urlTokens.username) {
-    authorization = urlTokens.username;
+    authorization = decodeCredential(urlTokens.username);
   }
 
   return {
