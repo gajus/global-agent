@@ -24,6 +24,18 @@ test('returns `true` if subdomain matches (using dot wildcard)', () => {
   expect(isUrlMatchingNoProxy('http://bar.foo.com/', '.foo.com')).toBe(true);
 });
 
+test('returns `true` if nested subdomain matches (using dot wildcard)', () => {
+  expect(isUrlMatchingNoProxy('http://baz.bar.foo.com/', '.foo.com')).toBe(true);
+});
+
+test('returns `false` if host only ends with the same string (using dot wildcard)', () => {
+  expect(isUrlMatchingNoProxy('http://barfoo.com/', '.foo.com')).toBe(false);
+});
+
+test('returns `false` if host only ends with the same string (using dot wildcard and port)', () => {
+  expect(isUrlMatchingNoProxy('http://barfoo.com:8080/', '.foo.com:8080')).toBe(false);
+});
+
 test('returns `true` if hosts match (*) and ports match', () => {
   expect(isUrlMatchingNoProxy('http://foo.com:8080/', '*:8080')).toBe(true);
 });
